@@ -1745,7 +1745,7 @@
       "token": 51,
       "start": 1516005210,
       "finish": 1516034010,
-      "status": "active",
+      "status": "finished",
       "question_set": [
         0,
         4,
@@ -1767,7 +1767,8 @@
           "win_pctg": {
             "questions": 0,
             "categories": 0
-          }
+          },
+          "question": -1
         },
         {
           "uid": 1,
@@ -1780,7 +1781,8 @@
           "win_pctg": {
             "questions": 0,
             "categories": 0
-          }
+          },
+          "question": -1
         },
         {
           "uid": 2,
@@ -1891,7 +1893,7 @@
       "token": 92,
       "start": 1516005810,
       "finish": 1516034610,
-      "status": "active",
+      "status": "finished",
       "question_set": [
         0,
         4,
@@ -1915,7 +1917,8 @@
           "win_pctg": {
             "questions": 0,
             "categories": 0
-          }
+          },
+          "question": -1
         },
         {
           "uid": 3,
@@ -1928,7 +1931,8 @@
           "win_pctg": {
             "questions": 0,
             "categories": 0
-          }
+          },
+          "question": -1
         },
         {
           "uid": 5,
@@ -2323,7 +2327,7 @@
       "active_review_round": 14,
       "id": 21,
       "receive": null,
-      "mockAs": 5
+      "mockAs": -1
     },
     {
       "identity": "0xc9f413023e002651def5d896abfa7fa360680940",
