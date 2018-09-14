@@ -26,11 +26,11 @@ In ratings, a lot of money is at stake, leading to considerable difficulty of be
 
 Longmire uses strong kyc together with an adversarial process coupled with game play where honest behavior is rewarded 
 
-Originally veva, Longmire begins with Ratestream, an innovative use of telegram bots to generate an ongoing stream of fresh data, highly responsive to new knowledge revealed and market movements. The use of the Bot as interface allows for easy onboarding to attract and train new analysts
+Originally Veva and then derived and evolved from that protocol, Longmire begins with Ratestream, an innovative use of telegram bots to generate an ongoing stream of fresh data, highly responsive to new knowledge revealed and market movements. The use of the Bot as interface allows for easy onboarding to attract and train new analysts
 
-in addition, the rapid game play and flow lead to participants becoming knowledgable about important cybertokens, and well-versed in the approaches to analyzing token sentiment along several different dimensions
+In addition, the rapid game play and flow lead to participants becoming knowledgable about important cybertokens, and well-versed in the approaches to analyzing token sentiment along several different dimensions
 
-we also provide an api and a widget for placement of sentiment data bext to. 
+We also provide an api and a widget for placement of sentiment data on external websites and journals. 
 
 ## Website
 [Longmire-IO](https://longmire.io)
