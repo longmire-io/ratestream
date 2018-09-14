@@ -107,11 +107,22 @@ Tools
 
 #### Bot Commands:
 
-* /start: Starts the bot
-* /tokens: view available tokens
-* /checkToken <Token Ticker>: Pull Token Data
+Regular User commands
+* /start, /restart: Starts the bot or refreshes main buttons
+* /review: review a new token, or continue reviewing an assigned token
+* /rate: rate a new token, or continue rating an assigned token
+* /activity: show user status, rounds active and historical, tokens won
+* /news
+* /token <id>
+* /tokens <range>
+* /portfolio: show user portfolios
 
-
+Admin Privileged commands
+* /refreshInfo: Force refresh of Info sources
+* /refreshTopTokens: Force refresh of live token data
+* /clearRounds: clear all rounds
+* /time: show current game time
+* /cron: advance current game time
 
 
 
