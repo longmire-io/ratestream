@@ -1,22 +1,28 @@
 pragma solidity ^0.4.24;
 
-import 'openzeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
-//import './TokenVesting.sol';
-
-contract LmrToken is StandardToken {
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
 
 
-  string public name = 'Longmire';
-  string public symbol = 'LMR';
-  uint8 public decimals = 18;
-  uint public INITIAL_SUPPLY = 10000000;
+/**
+ * @title LmrToken
+ * @dev all tokens are pre-assigned to the creator.
+ * Note they can later distribute these tokens as they wish using `transfer` and other
+ * `ERC20` functions.
+ */
+contract LmrToken is ERC20 {
 
+  string public constant name = "Longmire";
+  string public constant symbol = "LMR";
+  uint8 public constant decimals = 18;
+
+  uint256 public constant INITIAL_SUPPLY = 10000000 * (10 ** uint256(decimals));
+
+  /**
+   * @dev Constructor that gives msg.sender all of existing tokens.
+   */
   constructor() public {
-    totalSupply_ = INITIAL_SUPPLY;
-    balances[msg.sender] = INITIAL_SUPPLY;
+    _mint(msg.sender, INITIAL_SUPPLY);
   }
-
-//TokenVesting (0x9f943ed85fb1b63b2a68af79290e5023d32f5e96, 15, 30, 40, false);
 
 }
 

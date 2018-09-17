@@ -160,7 +160,7 @@
     "node-sass": "^4.9.2",
     "normalizr": "^3.2.4",
     "nuka-carousel": "^3.0.1",
-    "openzeppelin-solidity": "1.12.0",
+    "openzeppelin-solidity": "2.0.0-rc.1",
     "pretty-error": "^2.1.1",
     "prop-types": "^15.6.0",
     "qs": "^6.5.2",
