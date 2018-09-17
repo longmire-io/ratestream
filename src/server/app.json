@@ -2565,7 +2565,7 @@
       "token": 85,
       "start": 1516258050,
       "finish": 1516286850,
-      "status": "active",
+      "status": "finished",
       "question_set": [
         0,
         4,
@@ -2589,7 +2589,8 @@
           "win_pctg": {
             "questions": 0,
             "categories": 0
-          }
+          },
+          "question": -1
         },
         {
           "uid": 4,
@@ -2602,7 +2603,8 @@
           "win_pctg": {
             "questions": 0,
             "categories": 0
-          }
+          },
+          "question": -1
         },
         {
           "uid": 21,
