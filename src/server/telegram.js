@@ -3,13 +3,13 @@
 const TelegramBot = require('node-telegram-bot-api')
 const { InlineKeyboard, ReplyKeyboard, ForceReply } = require('telegram-keyboard-wrapper')
 
-const { translate } = require('../nlp')
+const { translate } = require('./nlp')
 const moment = require('moment')
 
-var app = require('../application')
+var app = require('./application')
 const { say, identify } = app
 
-const formatters = require('./formatters')
+const formatters = require('./bots/formatters')
 
 var { tokens, users, rounds, analyst_questions, reviewer_questions, reviews, scripts } = app.data
 
@@ -33,7 +33,7 @@ console.log( doc.sentences().toNegative().out('text'))
 /* */
 
 
-const config = require('../config.js')
+const config = require('./config.js')
 
 
 //const survey = require('../../app/services/survey')

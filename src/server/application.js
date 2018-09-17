@@ -2,7 +2,7 @@
 const fs = require('fs')
 const moment = require('moment')
 
-
+console.log('working dir:',process.cwd())
 const config = require('./config')
 
 const roundsService = require('../app/services/API/rounds')
