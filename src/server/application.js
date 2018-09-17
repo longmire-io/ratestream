@@ -171,8 +171,8 @@ const app = {
 	},
 
 	saveTokens: () => {
-		console.log(`${time_str(now)}: saving tokens`)
-		fs.writeFileSync(`${config.datadir}tokens.json`, JSON.stringify(tokenData,null,2), 'utf8')		
+		console.log(`${time_str(now)}: saving tokens to ${config.datadir}tokens.json`)
+		fs.writeFileSync(`${config.datadir}/tokens.json`, JSON.stringify(tokenData,null,2), 'utf8')		
 	},
 
 	/* rounds */
