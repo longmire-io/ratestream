@@ -3,7 +3,7 @@ const fs = require('fs')
 const moment = require('moment')
 
 
-const config = require('../app/config/appConfig')
+const config = require('./config')
 
 const roundsService = require('../app/services/API/rounds')
 const cyclesService = require('../app/services/API/cycles')
@@ -26,12 +26,12 @@ const coinmarket = require('../app/services/API/coinmarket')
 const info = require('../app/services/API/newsinfo')
 
 
-let appData = require('./app.json')
-let infoData = require('./info.json')
-let scripts = require('./scripts.json')
-let questions = require('./analyst_questions.json')
-let tokenData = require('./tokens.json')
-let time = require('./time.json')
+let appData = require(`${config.datadir}/app.json`)
+let infoData = require(`${config.datadir}/info.json`)
+let scripts = require(`${config.datadir}/scripts.json`)
+let questions = require(`${config.datadir}/analyst_questions.json`)
+let tokenData = require(`${config.datadir}/tokens.json`)
+let time = require(`${config.datadir}/time.json`)
 
 var { rounds, users } = appData
 var { tokens, coinmarket_ids } = tokenData
@@ -135,7 +135,7 @@ const app = {
 	cron: forward_seconds => { 
 		now += forward_seconds 
 		time.last_time = now
-		fs.writeFileSync('../time.json', JSON.stringify(time,null,2), 'utf8')
+		fs.writeFileSync(`${config.datadir}/time.json`, JSON.stringify(time,null,2), 'utf8')
 	},
 	start: ( autosave = true, cb ) => {  // start app
 		if (autosave) saveTimer = setInterval( ()=> {
@@ -162,17 +162,17 @@ const app = {
 	save: () => {
 		console.log(`${time_str(now)} saving app`)
 		app.now = now
-		fs.writeFileSync('../app.json', JSON.stringify(appData,null,2), 'utf8')
+		fs.writeFileSync(`${config.datadir}/app.json`, JSON.stringify(appData,null,2), 'utf8')
 	},
 
 	saveInfo: () => {
 		console.log(`${time_str(now)}: saving info`)
-		fs.writeFileSync('../info.json', JSON.stringify(infoData,null,2), 'utf8')
+		fs.writeFileSync(`${config.datadir}/info.json`, JSON.stringify(infoData,null,2), 'utf8')
 	},
 
 	saveTokens: () => {
 		console.log(`${time_str(now)}: saving tokens`)
-		fs.writeFileSync('../tokens.json', JSON.stringify(tokenData,null,2), 'utf8')		
+		fs.writeFileSync(`${config.datadir}tokens.json`, JSON.stringify(tokenData,null,2), 'utf8')		
 	},
 
 	/* rounds */
