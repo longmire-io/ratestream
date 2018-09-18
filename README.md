@@ -112,14 +112,17 @@ Regular User commands
 * /review: review a new token, or continue reviewing an assigned token
 * /rate: rate a new token, or continue rating an assigned token
 * /activity: show user status, rounds active and historical, tokens won
-* /news
-* /token <id>
-* /tokens <range>
+* /news: show news relevant to current and recent game states and portfolio
+* /token num
+* /tokens <range-start from top>
 * /portfolio: show user portfolios
-
+* /settings: adjust user settings
+  
 Admin Privileged commands
 * /refreshInfo: Force refresh of Info sources
 * /refreshTopTokens: Force refresh of live token data
+* /tally: assess rounds statuses
+* /ratings: compile ratings snapshot for tokens
 * /clearRounds: clear all rounds
 * /time: show current game time
 * /cron: advance current game time
