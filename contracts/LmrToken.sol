@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
-
+import 'openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol';
 
 /**
  * @title LmrToken
@@ -10,7 +10,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/ERC20.sol';
  * `ERC20` functions.
  */
 contract LmrToken is ERC20 {
-
+  using SafeERC20 for ERC20;
   string public constant name = "Longmire";
   string public constant symbol = "LMR";
   uint8 public constant decimals = 18;
@@ -21,8 +21,8 @@ contract LmrToken is ERC20 {
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
   constructor() ERC20() public {
-    _totalSupply = INITIAL_SUPPLY;
-    //_mint(msg.sender, INITIAL_SUPPLY);
+
+    _mint(msg.sender, INITIAL_SUPPLY);
   }
 
 }
