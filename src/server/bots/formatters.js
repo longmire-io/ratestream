@@ -21,8 +21,8 @@ module.exports = {
 		"reply_markup": {
 			"resize_keyboard": true,
     	"keyboard": [
-    		[ "tokens", "commands", "news", "activity" ],
-    		[ "rate", "review", "portfolio" ]
+    		[ "tokens", "cmds", "news", "activity" ],
+    		[ "rate", "review", "portfolio", "settings" ]
     	]
    	}
 	}),

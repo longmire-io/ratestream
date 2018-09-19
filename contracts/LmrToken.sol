@@ -20,8 +20,9 @@ contract LmrToken is ERC20 {
   /**
    * @dev Constructor that gives msg.sender all of existing tokens.
    */
-  constructor() public {
-    _mint(msg.sender, INITIAL_SUPPLY);
+  constructor() ERC20() public {
+    _totalSupply = INITIAL_SUPPLY;
+    //_mint(msg.sender, INITIAL_SUPPLY);
   }
 
 }
