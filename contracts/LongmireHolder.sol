@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/TokenTimelock.sol';
 
-contract LmrHolder is TokenTimelock {
+contract LongmireHolder is TokenTimelock {
   constructor(
     IERC20 token,
     address beneficiary,

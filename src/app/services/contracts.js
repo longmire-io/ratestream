@@ -2,10 +2,14 @@ const config = require( '../config/appConfig' )
 const contract = require( 'truffle-contract' )
 const utils = require( './utils' )
 
-const TokenERC20Contract = require('../../../build/contracts/TokenERC20.json')
-const TestTokenERC20Contract = require('../../../build/contracts/vevaTest.json')
+//const TokenERC20Contract = require('../../../build/contracts/TokenERC20.json')
+//const TestTokenERC20Contract = require('../../../build/contracts/vevaTest.json')
 const RatingAgencyContract = require('../../../build/contracts/RatingAgency.json')
 const AnalystRegistryContract = require('../../../build/contracts/AnalystRegistry.json')
+
+const LmrTokenContract = require('../../../build/contracts/LmrToken.json')
+const LongmireHolder = require('../../../build/contracts/LongmireHolder.json')
+const LongmireSaleContract = require('../../../build/contracts/LongmireSale.json')
 
 module.exports = {
   // addr not set for use deployed default
@@ -30,14 +34,20 @@ module.exports = {
     })
   }),
 
-  getTokenERC20: addr => module.exports.getContractInstance( TokenERC20Contract, addr ),
+  //getTokenERC20: addr => module.exports.getContractInstance( TokenERC20Contract, addr ),
 
-  getTestTokenERC20: addr => module.exports.getContractInstance( TestTokenERC20Contract, addr ),
+  //getTestTokenERC20: addr => module.exports.getContractInstance( TestTokenERC20Contract, addr ),
 
   getRatingAgency: addr => module.exports.getContractInstance( RatingAgencyContract, addr ), //, appConfig.RATING_AGENCY )
 
-  getAnalystRegistry: addr => module.exports.getContractInstance( AnalystRegistryContract, addr ) //, appConfig.ANALYST_REGISTRY )
+  getAnalystRegistry: addr => module.exports.getContractInstance( AnalystRegistryContract, addr ), //, appConfig.ANALYST_REGISTRY )
 
+  getLmrTokenContract: addr => module.exports.getContractInstance( LmrTokenContract, addr ),
+
+  getLongmireHolderContract: addr => module.exports.getContractInstance( LongmireHolderContract, addr ),
+  
+  getLongmireSaleContract: addr => module.exports.getContractInstance( LongmireSaleContract, addr ) 
 }
+
 
 
