@@ -287,7 +287,7 @@ bot.on('message', msg => {
 		switch (msgText) {
 			case 'news':
 				app.topNewsByCoin('monero').then( articles => console.log(articles) )
-			case 'commands':
+			case 'cmds':
 				tell(msg.chat.id, say('commands'))
 				break
 			case 'tokens':

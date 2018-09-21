@@ -831,7 +831,7 @@ const app = {
 		//var ret = (text,format) => ({ text:text, format:format })
 		console.log(`command is ${command}`,data)
 		switch (command) {
-			case 'cmds': 
+			case 'commands': 
 				retval = { text: dialogs['commands'].text() }
 				break
 			case 'activity':
