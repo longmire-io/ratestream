@@ -32,6 +32,9 @@ let scripts = require(`${config.datadir}/scripts.json`)
 let questions = require(`${config.datadir}/analyst_questions.json`)
 let tokenData = require(`${config.datadir}/tokens.json`)
 let time = require(`${config.datadir}/time.json`)
+let token_classify = require(`${config.datadir}/crypto-classify.json`)
+token_classify.categories.forEach( category => console.log(category.name) )
+token_classify.sectors.forEach( sector => console.log(sector.name) )
 
 var { rounds, users } = appData
 var { tokens, coinmarket_ids } = tokenData
@@ -42,6 +45,7 @@ var tokens_covered = tokens.reduce( (covered,token,tIdx) => {
 
 console.log('<covered tokens>')
 tokens_covered.forEach( id => console.log(`${id} ${tokens[id].name}`) )
+//tokens_covered.forEach( id => console.log(utils.tokenSvg(tokens[id].name)+'\n'))
 
 const question_set = [0,4,8,12,16,20,24,25,26]
 const analyst_questions = question_set.map( qnum => questions[qnum] )

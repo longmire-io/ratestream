@@ -66,7 +66,20 @@ module.exports = {
     let base = Math.floor(Math.log(Math.abs(n))/Math.log(1000));
     let suffix = 'kmb'[base-1];
     return suffix ? module.exports.round(n/Math.pow(1000,base),2)+suffix : ''+n
-  }
+  },
+
+  tokenSvg: name => `<text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Verdana;-inkscape-font-specification:'Verdana, Normal';text-align:start;text-anchor:start;opacity:1;fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:12;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;writing-mode:lr;line-height:125%;"
+       x="165.71429"
+       y="200.93362"
+       id="text3336"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         x="165.71429"
+         y="200.93362"
+         id="tspan3340">${name}</tspan></text>`
+
 }
 
 
