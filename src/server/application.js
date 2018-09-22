@@ -58,6 +58,7 @@ const formatters = require('./bots/formatters')
 
 const categories = config.review_categories
 
+const isStr = str => str instanceof String || typeof str === "string"
 
 const commands = [
 	'review',
@@ -296,11 +297,11 @@ const app = {
 			phases: [{ // pre or post review
 				start: now, 
 				finish: now + round_phase_window, 	
-				answers: new Array(analyst_questions.length).fill({}) 			
+				answers: analyst_questions.map( question => question.restrict == 'post' ? { restricted: true } : {} )
 			},{
 				start: now + round_phase_window,
 				finish: now + 2*round_phase_window,
-				answers: new Array(analyst_questions.length).fill({})			
+				answers: analyst_questions.map( question => question.restrict == "pre" ? { restricted: true }: {} )			
 			}],
 			sways: new Array(analyst_questions.length).fill(0)
 		})
@@ -924,7 +925,10 @@ const app = {
 				roundUser = round.users.find( roundUser => roundUser.uid == user.id )
 				phase = roundUser.phases[roundUser.phase]
 				phase.answers[question_number] = { value: answer, timestamp: now }
-				roundUser.question = phase.answers.findIndex( answer => !answer.timestamp )
+				roundUser.question = phase.answers.findIndex( (answer,idx) => 
+					!answer.timestamp 	// not answered yet
+					&& !answer.restricted  // question not to be given because belongs only to other phase
+				)
 				//console.log('next question',roundUser.question)
 
 				if (roundUser.question == -1) { // finished phase...todo: time check for 10 minute limit
@@ -1159,7 +1163,8 @@ const app = {
 				let roundUser = round.users.find( roundUser => roundUser.uid == user.id )
 				//console.log('round user question ',roundUser)
 				let question = analyst_questions[roundUser.question]
-				return `\n${tokens[round.token].name}\n<b>${question.category}</b>:${question.name}      <i>${roundUser.phase ? 'post-review':'pre-review'}</i>\n\n${question.text}`
+				let text = isStr(question.text) ? question.text : question.text[roundUser.phase ? "post":"pre"]
+				return `\n${tokens[round.token].name}\n<b>${question.category}</b>:${question.name}      <i>${roundUser.phase ? 'post-review':'pre-review'}</i>\n\n${text}`
 			}
 		},
 		'analysis.finished':{
