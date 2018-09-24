@@ -38,9 +38,11 @@ token_classify.sectors.forEach( sector => console.log(sector.name) )
 var { rounds, users } = appData
 var { tokens, coinmarket_ids } = tokenData
 var tokens_covered = tokens.reduce( (covered,token,tIdx) => {
+	//tokens[tIdx] = { id:tIdx, ...token } // 
 	if (token.tags && (token.tags.includes('top') || token.tags.includes('mover'))) covered.push( tIdx )
 	return covered
 }, [])
+
 
 console.log('<covered tokens>')
 tokens_covered.forEach( id => console.log(`${id} ${tokens[id].name}`) )
@@ -387,13 +389,15 @@ const app = {
 				})
 			})
 			// TODO: !! important...test this
-			if ( tally.answers.filter( answer => answer.count ).length && tally.categories.filter( category => category.count ).length ) {
+			if ( tally.answers.filter( answer => answer.count ).length ) {// && tally.categories.filter( category => category.count ).length ) {
 				if (!token.tallies) token.tallies = [tally]
 				else {
-					// TODO: don't add tallies if no change to any, only update timestamp
-					token.tallies.push(tally)
+					token.tallies = token.tallies.filter( tallycheck => tally.round !== tallycheck.round )
+					token.tallies.push(tally) // only keep one tally per round
 				}
+				console.log('tally',tally)
 			}
+			//console.log('done')
 			// Expire reviewers and raters if due
 			if (round.status == 'active') {
 				
@@ -429,6 +433,7 @@ const app = {
 		})
 		
 		app.save()
+		app.saveTokens()
 
 		/* from veva: get winner
         uint8 r0 = uint8(round.averages[ 0 ][ 0 ]);
@@ -478,6 +483,7 @@ const app = {
 							console.log('tally accum',tally_accum)
 						}
 
+						// TODO: Fix me!  Doesn't work if questions or categories change
 						let reslt = ({ 
 							answers: tally.answers.map( ( answer, aIdx) => blend( tally_accum.answers[idx], answer ) ),
 							//categories: tally.categories.map( ( category, cIdx) => blend( tally_accum.categories[cIdx], category ) )
@@ -564,16 +570,18 @@ const app = {
 		console.log(`assessing winnings for round ${round.id}`)
 		let token = tokens[round.token]
 		//console.log('token tallies',token.tallies)
-		let tally = token.tallies.reduceRight( (rslt, tally, tIdx, arr) => {
+		let tally = token.tallies.find( tally => tally.round == round.id )
+		/*token.tallies.reduceRight( (rslt, tally, tIdx, arr) => {
 			//console.log('tally reduce',tally,tIdx)
 			console.log(`round ${tally.round} id: ${round.id}`)
 			if (tally.round !== round.id) return rslt
 			console.log('got tally')
 			arr.splice(0) // terminate, found
 			return tally
-		},{})
-		console.log(`got tally for round ${round.id} and token ${round.token}:${tokens[round.token].name}`,tally)
+		},{}) */
 		if (!tally) return
+		console.log(`got tally for round ${round.id} and token ${round.token}:${tokens[round.token].name}`,tally)
+
 
 		// award lead winner
 		let counts = tally.categories.reduce( (counts, category) => {
@@ -589,10 +597,9 @@ const app = {
 			roundUser.payoff = PAYOFF_LEAD_WIN
 			app.payoff( users[roundUser.uid], PAYOFF_LEAD_WIN, round.id )			
 		}
-
+		return
 		// award jurists
 		// for each question / answer
-		/*
 		round.question_set.forEach( (qnum,qIdx) => {
 			let question = analyst_questions[qnum]
 			// check for question used as assessment or disqual
@@ -608,21 +615,17 @@ const app = {
 				distancesum += distance				
 				return distance
 			})
+			// calculate the percentiles
+			let percentiles = roundusersdistance.map( distance => {
+				if (distance == null) return
+				return distance / distancesum 			
+			})
+			console.log(`percentiles for question ${qIdx}`,percentiles)
 
-
-		// calculate the percentiles
-		let percentiles = roundusersdistance.map( distance => {
-			if (distance == null) return
-			percentile = distance / distancesum
-			
-		})
-
-		percenile = distance / distancesum
-		convert to winnings 10,25,50 of PAYOFF_JURIST_WIN			
+		//convert to winnings 10,25,50 of PAYOFF_JURIST_WIN			
 
 		})
 
-*/
 
 
 		// Assess winnings for jurists
@@ -818,8 +821,7 @@ const app = {
 				let token_idx = tokens.findIndex( token => token.cmc_id == ticker_token.id )
 				if ( token_idx == -1 ) {
 					token_idx = tokens.length
-					t_token.quotes = []
-					tokens.push( t_token )
+					tokens.push( { id:token_idx, ...t_token, quotes:[] } )
 				} else {
 					t_token.quotes = tokens[ token_idx ].quotes
 				}
@@ -1781,6 +1783,8 @@ app.saveTokens()
  --- */
 
 const token_name = round => tokens[round.token].name
+app.saveTokens()
+
 
 module.exports = app
 
