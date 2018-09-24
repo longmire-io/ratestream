@@ -259,7 +259,8 @@ const appConfig = {
     "resources",
     "token-supply",
     "transparency",
-    "summary"
+    "summary",
+    "qualification"
   ],
 
   ratings: [

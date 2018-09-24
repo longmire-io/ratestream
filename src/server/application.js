@@ -2,7 +2,6 @@
 const fs = require('fs')
 const moment = require('moment')
 
-console.log('working dir:',process.cwd())
 const config = require('./config')
 
 const roundsService = require('../app/services/API/rounds')
@@ -50,10 +49,14 @@ tokens_covered.forEach( id => console.log(`${id} ${tokens[id].name}`) )
 const question_set = [0,4,8,12,16,20,24,25,26]
 const analyst_questions = question_set.map( qnum => questions[qnum] )
 
+const question_winnings = {
+	category: category => category != 0 // questions to consider
+}
+
 var testUsers = users.filter( user => user.first_name.startsWith('tester_'))
 
 //const dialogs = require('./dialogs')
-const formatters = require('./bots/formatters')
+//const formatters = require('./bots/formatters')
 
 
 const categories = config.review_categories
@@ -81,19 +84,24 @@ const commands = [
 var saveTimer
 var cronTimer
 
-const round_window = 3600*8 // 8 hours
-const round_window_min = 3600*2 // 2 hours, minimum window left for a second lead to be added, otherwise round cancelled
-const round_phase_window = 20*60 // 20 minutes per phase max
+const MINUTE =			60
+const HOUR = 				MINUTE * 60
+const DAY = 				HOUR * 24
+const WEEK = 				DAY * 7
+const FORTNIGHT = 	WEEK * 2
+const MONTH = 			DAY * 28
 
-const tally_window = 3600*24*7   // window from now to consider tallies (e.g. 1 week)
+const round_window = HOUR * 8 // 8 hours
+const round_window_min = HOUR * 2 // 2 hours, minimum window left for a second lead to be added, otherwise round cancelled
+const round_phase_window = MINUTE * 20 // 20 minutes per phase max
+
+const tally_window = WEEK   // window from now to consider tallies (e.g. 1 week)
 
 
-const WEEK = 3600*24*7
-const FORTNIGHT = WEEK * 2
-const DAY = 3600*24
-const MONTH = 3600*24*28
+const PAYOFF_LEAD_WIN = 6
 
-const parseHtml = {parse_mode:'HTML'} 
+
+const parseHtml = { parse_mode:'HTML' } 
 
 const dashes = '------------------------'
 
@@ -132,6 +140,8 @@ const periods = [
 	{ name: 'week', value: WEEK },
 	{ name: 'month', value: MONTH }
 ]
+
+
 
 const app = {
 	...info,
@@ -176,7 +186,7 @@ const app = {
 	},
 
 	saveTokens: () => {
-		console.log(`${time_str(now)}: saving tokens to ${config.datadir}tokens.json`)
+		console.log(`${time_str(now)}: saving tokens to ${config.datadir}/tokens.json`)
 		fs.writeFileSync(`${config.datadir}/tokens.json`, JSON.stringify(tokenData,null,2), 'utf8')		
 	},
 
@@ -328,10 +338,10 @@ const app = {
 		// tally windowed_rounds
 		rounds.filter( round => round.finish >= now - tally_window ).forEach( round => {
 			//console.log(`${now}:run round ${round.id} ${round.finish} ${round.status}` )
-
 			let token = tokens[round.token]
 			let tally = {	 
 				timestamp: now,
+				round: round.id,
 				answers: new Array(analyst_questions.length).fill().map( _ => ({count:0, avg:0, sway_count:0, avg_sway:0, winner:null})),
 				categories: new Array(categories.length).fill().map( _ => ({count:0, avg:0, sway_count:0, avg_sway:0, winner:null }))
 			}
@@ -339,7 +349,6 @@ const app = {
 			// go through all the valid answers
 			round.users.forEach( (rounduser,uIdx) => {
 				if (uIdx < 2) return // not for leads
-
 				analyst_questions.forEach( (question,qIdx) => {
 					const whoWins = ( avg, avg_sway ) => {
 						if (avg_sway > question.max * 0.2) return 0
@@ -349,11 +358,11 @@ const app = {
 					let answer = rounduser.phases[1].answers[ qIdx ].timestamp ? rounduser.phases[1].answers[ qIdx ] 
 						: ( rounduser.phases[0].answers[ qIdx ].timestamp ? rounduser.phases[0].answers[qIdx]: null )
 					if (answer) { 
-
 						let sway = rounduser.phases[1].answers[ qIdx ].timestamp && rounduser.phases[0].answers[ qIdx ].timestamp ? 
 							{ value: rounduser.phases[1].answers[ qIdx ].value - rounduser.phases[0].answers[ qIdx ].value } : null 
-
 						let categoryIdx = categories.findIndex( category => category == question.category )
+						if (categoryIdx == -1) 
+							console.log(`programmer error, category "${question.category}" not found for round ${round.id} question ${qIdx}`)
 						tallyCat = tally.categories[categoryIdx]
 						tallyCat.avg = ( tallyCat.count * tallyCat.avg + answer.value ) / (tallyCat.count + 1)
 						tallyCat.count++ 
@@ -378,7 +387,10 @@ const app = {
 			// TODO: !! important...test this
 			if ( tally.answers.filter( answer => answer.count ).length && tally.categories.filter( category => category.count ).length ) {
 				if (!token.tallies) token.tallies = [tally]
-				else token.tallies.push(tally)
+				else {
+					// TODO: don't add tallies if no change to any, only update timestamp
+					token.tallies.push(tally)
+				}
 			}
 			// Expire reviewers and raters if due
 			if (round.status == 'active') {
@@ -445,6 +457,10 @@ const app = {
 		}
 	*/
 	ratingsUpdate: (  ) => { // get best current and previous ratings for different time windows
+		const blend = (aa, answer) => ({
+			count: aa.count + answer.count, 
+			avg: aa.count || answer.count ? ( aa.count * aa.avg + answer.count * answer.avg ) / ( aa.count + answer.count ) : 0
+		})
 		console.log(`${time_str(now)} ratings update`)
 		let ratings = tokens.reduce( ( taccum, token, tIdx ) => {
 			if (!token.tallies) return taccum
@@ -453,17 +469,10 @@ const app = {
 					let time = idx ? now - period.value : now
 					accum[period.name] = token.tallies.filter( 
 						tally => tally.timestamp < time && tally.timestamp > ( time - period.value ) 
-					).reduce( (tally_accum,tally) => {
-						if (token.name == 'Komodo') console.log('accuming tally')
-						const blend = (aa, answer) => ({
-							count: aa.count + answer.count, 
-							avg: aa.count || answer.count ? ( aa.count * aa.avg + answer.count * answer.avg ) / ( aa.count + answer.count ) : 0
-						})
-						return { 
+					).reduce( (tally_accum,tally) => ({ 
 							answers: tally.answers.map( ( answer, aIdx) => blend( tally_accum.answers[idx], answer ) ),
 							categories: tally.categories.map( ( category, cIdx) => blend( tally_accum.categories[cIdx], category ) )
-						}
-					},{ 
+					}),{ 
 						answers: new Array(analyst_questions.length).fill().map( _ => ({ count: 0, avg: 0 })),
 						categories: new Array(categories.length).fill().map( _ => ({ count: 0, avg: 0 }))
 					})
@@ -517,14 +526,201 @@ const app = {
 	roundExpire: ( round ) => {
 		// compute sways and points
 		console.log(`round ${round.id} expire`)
+		/* take out for testing
 		app.roundClear( round )
 		round.status = 'finished'
-		//app.save()
+		*/
+		app.roundWinnings( round ) // assess winnings
 	},
 	roundRole: ( round, user ) => ( 
 		round.users[0].uid == user.id ? 'bull': 
 		( round.users[1].uid == user.id ? 'bear': 'rater')
 	),
+	payoff: (user, award, ref) => {
+		//console.log('payoff',user, award,ref)
+		if (!user.payoffs) user.payoffs = []
+		user.payoffs.push( { timestamp: now, award: award, ref: ref } )
+		//console.log('paid off user',user.id, award, ref)
+	},
+	payoffsProcess: () => {	// realize tokens from blockchain
+
+	},
+	roundWinnings: round => {
+		console.log(`assessing winnings for round ${round.id}`)
+		let token = tokens[round.token]
+		//console.log('token tallies',token.tallies)
+		let tally = token.tallies.reduceRight( (rslt, tally, tIdx, arr) => {
+			//console.log('tally reduce',tally,tIdx)
+			console.log(`round ${tally.round} id: ${round.id}`)
+			if (tally.round !== round.id) return rslt
+			console.log('got tally')
+			arr.splice(0) // terminate, found
+			return tally
+		},{})
+		console.log(`got tally for round ${round.id} and token ${round.token}:${tokens[round.token].name}`,tally)
+		if (!tally) return
+
+		let counts = tally.categories.reduce( (counts, category) => {
+			if (category.winner === null) return counts
+			counts[category.winner]++
+			return counts
+		},[0,0])
+		console.log('got counts',counts)
+		round.winner = counts[0] === counts[1] ? null : (counts[0] > counts[1] ? 0 : 1) 
+		console.log('round winner',round.winner,' user ',round.users[round.winner].uid)
+		if (round.winner !== null) app.payoff( users[round.users[round.winner].uid], PAYOFF_LEAD_WIN, round.id )
+		// Assess winnings for jurists
+			/*     
+			   {
+          round: 3,
+          "timestamp": 1516252940,
+          "answers": [
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 2,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 2,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 2,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 1,
+              "avg_sway": 2,
+              "winner": 0
+            }
+          ],
+          "categories": [
+            {
+              "count": 0,
+              "avg": 0,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 0,
+              "avg": 0,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 2,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 0,
+              "avg": 0,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 2,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 2,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 2,
+              "avg": 3,
+              "sway_count": 0,
+              "avg_sway": 0,
+              "winner": null
+            },
+            {
+              "count": 1,
+              "avg": 3,
+              "sway_count": 1,
+              "avg_sway": 2,
+              "winner": 0
+            }
+          ]
+        } */
+
+	},
 	roundsClear: () => { // clear all rounds...beware!
 		appData.rounds = []
 		rounds = appData.rounds
@@ -555,30 +751,6 @@ const app = {
 			app.saveTokens()
 		}).catch( err => console.log('error fetching token tickers ',err))
 	},
-	/*
-	    "id": 1,
-      "name": "Bitcoin",
-      "symbol": "BTC",
-      "slug": "bitcoin",
-      "circulating_supply": 17253125,
-      "total_supply": 17253125,
-      "max_supply": 21000000,
-      "date_added": "2013-04-28T00:00:00.000Z",
-      "num_market_pairs": 6037,
-      "cmc_rank": 1,
-      "last_updated": "2018-09-06T22:17:21.000Z",
-      "quote": {
-        "USD": {
-          "price": 6469.49532626,
-          "volume_24h": 5701938887.38691,
-          "percent_change_1h": -0.165422,
-          "percent_change_24h": -6.91809,
-          "percent_change_7d": -6.56854,
-          "market_cap": 111619011550.87956,
-          "last_updated": "2018-09-06T22:17:21.000Z"
-        }
-      }
-   */
 	refreshTopTokens: () => {
 		coinmarket.refreshTickers( {sort:'market_cap',limit:200} ).then( token_tickers => {
 			//tokenData.coinmarket_tickers = token_tickers
@@ -1320,6 +1492,190 @@ const app = {
 		}
 	},
 
+	formatters: {
+		commands: cmds => {
+			
+		},
+		menu: () => ({ 
+			"reply_markup": {
+				"resize_keyboard": true,
+	    	"keyboard": [
+	    		[ "tokens", "cmds", "news", "activity" ],
+	    		[ "rate", "review", "portfolio", "settings" ]
+	    	]
+	   	}
+		}),
+		analyst_question: ( question, question_number ) => {
+			let ik = []
+			let row = []
+			if (question.max == 2) { // yes/no
+				row.push( { text: 'yes', callback_data: `question-${question_number}-0` } )
+				row.push( { text: 'no', callback_data: `question-${question_number}-1` } )
+			} else if (question.max == 3) {
+				row.push( { text: 'yes', callback_data: `question-${question_number}-0` } )
+				row.push( { text: 'no', callback_data: `question-${question_number}-2` } )
+				row.push( { text: 'uncertain', callback_data: `question-${question_number}-1` } )
+			} else for (let idx = 1; idx <= question.max; idx++ ) {
+	 			row.push( { text: config.ratings[question.max-1][idx-1], callback_data: `question-${question_number}-${idx-1}` })
+			}
+			ik.push( row )
+			console.log('ik',JSON.stringify(ik))
+	   	return { reply_markup:{ inline_keyboard: ik } }
+		},
+		analyst_questions: ( questions ) => (
+			questions.reduce( (str, question, num) => ( `${str}${num+1}. ${question.text}\n` ), "")
+		),
+		reviewer_categories: ( categories ) => {
+			let ik = []
+			let row = []
+			categories.forEach( (category,idx) => {
+				let catIdx = config.review_categories.findIndex( allcategory => allcategory == category )
+				let col = { text: category, callback_data: `review-category-${catIdx}` }
+				if (idx % 3 != 0) { // add column
+					row.push( col )
+				} else { // new row
+					if (row.length) ik.push( row )
+					row = [ col ]
+				}
+			})
+			ik.push( row )
+			return { reply_markup:{ inline_keyboard: ik } }		
+		},
+		rounds: rounds => {
+
+		},
+		apptime: seconds => ( 
+			`app time is [${seconds}] ${moment(seconds*1000).format('DD-MMMM-YYYY HH:MM:SS')}`
+		),
+		token: ( token, id ) => {
+			let ik = [[ 
+				{ text: 'info detail', callback_data: `token-details-${id}`},
+				{ text: 'rating detail', callback_data: `token-something`}
+			]]
+			return { reply_markup:{ inline_keyboard: ik } }		
+		},
+		tokens: (tokenIdxs, tokens) => {
+			//	let msgtokens = tokens.reduce( (str,token) => `${str}[${token.name}] `, "" )
+			let ik = []
+			let row = []
+			tokenIdxs.forEach( (idx,num) => {
+				let token = tokens[ idx ]
+				let col = { text: token.name, callback_data: `token-${idx}` }
+				if (num % 3 != 0) { // add column
+					row.push( col )
+				} else { // new row
+					if (row.length) ik.push( row )
+					row = [ col ]
+				}
+			})
+			ik.push( row )
+			console.log(ik)
+			return { reply_markup:{ inline_keyboard: ik } }
+		
+
+		},
+		tokenQuote: quote => { // fix this to match cmc
+
+			var str = ''
+			for ( let [key, value] of entries(market) ) {
+	   		if ( key === 'price' ) { 
+	   			if (value) {
+	   				str += '---------\n'
+		   			for ( let [pkey, pvalue] of entries(value) ) { // value can be 'false' / no price data
+		   				switch (pkey) {
+		   					case 'ts': 
+		   						str += ''
+		   						break
+		   					default: 
+		   						str += `<i>${pkey}</i> <b>${pvalue}</b>\n`
+		   				}
+		   			}
+		   			str += '---------\n'
+	   			}
+	   		} else {
+					switch (key) {
+						case 'address': 
+							str += `<i>${key}</i> <a href="https://etherscan.io/address/${value}">${value}</a>\n`
+	   					break
+	   				default:
+	   					str += `<i>${key}</i> <b>${value}</b>\n`
+	   				}
+	   			}
+				}
+			//console.log(str)
+			return str
+		}
+	}
+/*
+			[
+				{
+					"text":"1:1 button","callback_data":"1:1 Works!"
+				},
+				{"text":"1:2 button","callback_data":"1:2 Works!"},
+				{"text":"1:1 button","callback_data":"1:1 Works!"},
+				{"text":"1:2 button","callback_data":"1:2 Works!"}
+			],
+			[
+				{"text":"2:1 button","callback_data":"2:1 Works!"},
+				{"text":"2:2 button","callback_data":"2:2 Works!"},
+				{"text":"1:1 button","callback_data":"1:1 Works!"},
+				{"text":"1:2 button","callback_data":"1:2 Works!"}
+			]
+		]
+	}
+}
+		
+		{	
+			"id": 1,
+      "name": "Bitcoin",
+      "symbol": "BTC",
+      "slug": "bitcoin",
+      "circulating_supply": 17253125,
+      "total_supply": 17253125,
+      "max_supply": 21000000,
+      "date_added": "2013-04-28T00:00:00.000Z",
+      "num_market_pairs": 6037,
+      "cmc_rank": 1,
+      "last_updated": "2018-09-06T22:17:21.000Z",
+      "quotes": [{
+          "price": 6469.49532626,
+          "volume_24h": 5701938887.38691,
+          "percent_change_1h": -0.165422,
+          "percent_change_24h": -6.91809,
+          "percent_change_7d": -6.56854,
+          "market_cap": 111619011550.87956,
+          "last_updated": "2018-09-06T22:17:21.000Z"
+        	"units": "USD"
+      }]
+     }
+		{
+			"timestamp":1534704803,
+			"address":"0xf230b790e05390fc8295f4d3f60332c93bed42e2",
+			"name":"Tronix",
+			"decimals":"6",
+			"symbol":"TRX",
+			"totalSupply":"100000000000000000",
+			"owner":"0x",
+			"transfersCount":2812176,
+			"lastUpdated":1534704049,
+			"issuancesCount":0,
+			"holdersCount":1086597,
+			"ethTransfersCount":13,
+			"price":{
+				"rate":"0.0217371068",
+				"diff":3.32,
+				"diff7d":-4.38,
+				"ts":"1534703280",
+				"marketCapUsd":"1429173727.0",
+				"availableSupply":"65748111645.0",
+				"volume24h":"96649929.5064",
+				"diff30d":-40.690993326167,
+				"currency":"USD"
+			},
+			"countOps":2812176
+		}
+
+*/
 	/* temporary code for various things */
 /*
 				output.ratings.push({
@@ -1337,6 +1693,7 @@ const app = {
 
 app.runScript('test.user.1')
 const dialogs = app.dialogs
+const formatters = app.formatters
 
 /* clean out the tallies / temp 
 tokens.forEach( token => {

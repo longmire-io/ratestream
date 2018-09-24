@@ -9,8 +9,6 @@ const moment = require('moment')
 var app = require('./application')
 const { say, identify } = app
 
-const formatters = require('./bots/formatters')
-
 var { tokens, users, rounds, analyst_questions, reviewer_questions, reviews, scripts } = app.data
 
 
@@ -26,7 +24,7 @@ var t = translate('dinosaur').nouns().toPlural()
 
 console.log( t.out('text') )
 
-var doc = translate('London is calling')
+var doc = translate('Your mother is not calling')
 console.log( doc.sentences().toNegative().out('text'))
 
 
