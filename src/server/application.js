@@ -62,6 +62,7 @@ var testUsers = users.filter( user => user.first_name.startsWith('tester_'))
 const categories = config.review_categories
 
 const isStr = str => str instanceof String || typeof str === "string"
+const samesign = (n1,n2) => ((n1 < 0) == (n2 < 0))
 
 const commands = [
 	'review',
@@ -377,6 +378,7 @@ const app = {
 						tallyAnswer.avg = ( tallyAnswer.count * tallyAnswer.avg + answer.value ) / ( tallyAnswer.count + 1 )
 						tallyAnswer.count++			
 						if (sway) {
+							rounduser.sways[qIdx] = sway.value
 							tallyAnswer.avg_sway = ( tallyAnswer.sway_count * tallyAnswer.avg_sway + sway.value ) / ( tallyAnswer.sway_count + 1 )
 							tallyAnswer.sway_count++
 							tallyAnswer.winner = whoWins( tallyAnswer.avg, tallyAnswer.avg_sway )
@@ -464,15 +466,28 @@ const app = {
 		console.log(`${time_str(now)} ratings update`)
 		let ratings = tokens.reduce( ( taccum, token, tIdx ) => {
 			if (!token.tallies) return taccum
-			taccum[tIdx] = ['current','previous'].reduce( (cpaccum, iteration,idx) => { 	
+			console.log(`ratings for token ${token.name} ${tIdx}`)
+			taccum[tIdx] = ['current','previous'].reduce( (cpaccum, iteration, idx) => { 	
 				cpaccum[iteration] =  periods.reduce( (accum, period, pIdx )=> {
 					let time = idx ? now - period.value : now
 					accum[period.name] = token.tallies.filter( 
 						tally => tally.timestamp < time && tally.timestamp > ( time - period.value ) 
-					).reduce( (tally_accum,tally) => ({ 
+					).reduce( (tally_accum,tally) => {
+						if (tally.round == 20 ) {
+							console.log('using tally',tally)
+							console.log('tally accum',tally_accum)
+						}
+
+						let reslt = ({ 
 							answers: tally.answers.map( ( answer, aIdx) => blend( tally_accum.answers[idx], answer ) ),
-							categories: tally.categories.map( ( category, cIdx) => blend( tally_accum.categories[cIdx], category ) )
-					}),{ 
+							//categories: tally.categories.map( ( category, cIdx) => blend( tally_accum.categories[cIdx], category ) )
+							categories: categories.map( ( _, cIdx) => 
+								blend( tally_accum.categories[cIdx], cIdx < tally.categories.length ? tally.categories[cIdx]: {count:0,avg:0} ) // not pretty, but needed to resolve old tallies with different categories
+							)
+						})
+						if (tally.round == 20) console.log('returning result')
+						return reslt
+					},{ 
 						answers: new Array(analyst_questions.length).fill().map( _ => ({ count: 0, avg: 0 })),
 						categories: new Array(categories.length).fill().map( _ => ({ count: 0, avg: 0 }))
 					})
@@ -539,7 +554,7 @@ const app = {
 	payoff: (user, award, ref) => {
 		//console.log('payoff',user, award,ref)
 		if (!user.payoffs) user.payoffs = []
-		user.payoffs.push( { timestamp: now, award: award, ref: ref } )
+		user.payoffs.push( { timestamp: now, award: award, ref: ref, paid: false } )
 		//console.log('paid off user',user.id, award, ref)
 	},
 	payoffsProcess: () => {	// realize tokens from blockchain
@@ -560,6 +575,7 @@ const app = {
 		console.log(`got tally for round ${round.id} and token ${round.token}:${tokens[round.token].name}`,tally)
 		if (!tally) return
 
+		// award lead winner
 		let counts = tally.categories.reduce( (counts, category) => {
 			if (category.winner === null) return counts
 			counts[category.winner]++
@@ -568,7 +584,47 @@ const app = {
 		console.log('got counts',counts)
 		round.winner = counts[0] === counts[1] ? null : (counts[0] > counts[1] ? 0 : 1) 
 		console.log('round winner',round.winner,' user ',round.users[round.winner].uid)
-		if (round.winner !== null) app.payoff( users[round.users[round.winner].uid], PAYOFF_LEAD_WIN, round.id )
+		if (round.winner !== null) {
+			let roundUser = round.users[round.winner]
+			roundUser.payoff = PAYOFF_LEAD_WIN
+			app.payoff( users[roundUser.uid], PAYOFF_LEAD_WIN, round.id )			
+		}
+
+		// award jurists
+		// for each question / answer
+		/*
+		round.question_set.forEach( (qnum,qIdx) => {
+			let question = analyst_questions[qnum]
+			// check for question used as assessment or disqual
+			let tally_answer = tally.answers[qIdx] 
+			if (tally_answer.sway_count < 3) return// no winners for this question
+			let avg_sway = tally_answer.avg_sway
+			// for each round user
+			let distancesum = 0
+			let roundusersdistance = round.users.map( roundUser => {
+				let sway = roundUser.sways[qIdx]
+				if (!samesign(sway,avg_sway)) return null
+				let distance = Math.sqrt(Math.abs( n1*n1 - n2*n2))
+				distancesum += distance				
+				return distance
+			})
+
+
+		// calculate the percentiles
+		let percentiles = roundusersdistance.map( distance => {
+			if (distance == null) return
+			percentile = distance / distancesum
+			
+		})
+
+		percenile = distance / distancesum
+		convert to winnings 10,25,50 of PAYOFF_JURIST_WIN			
+
+		})
+
+*/
+
+
 		// Assess winnings for jurists
 			/*     
 			   {
@@ -922,7 +978,7 @@ const app = {
 	},
 	userActivity: user => {
 		console.log('get user activity',user)
-		return rounds.reduce( (output, round) => {
+		let roundsData = rounds.reduce( (output, round) => {
 			console.log('round',round)
 			let roundUserIdx = round.users.findIndex( rounduser => rounduser.uid == user.id )
 			if (roundUserIdx == -1) return output
@@ -965,7 +1021,15 @@ const app = {
 				})
 			}
 			return output
-		},{reviews:[],ratings:[], total_winnings:0})
+		},{reviews:[],ratings:[]})
+
+		let winnings = user.payoffs.reduce( (winnings,payoff) => { 
+			winnings.total += payoff.award 
+			if (payoff.paid) winnings.paid += payoff.award
+			return winnings
+		},{ total:0, paid:0 })
+		return { ...roundsData, total_winnings: winnings.total, paid_winnings: winnings.paid }
+		
 		/*
 		{ 
 			reviews: [{
@@ -1486,7 +1550,7 @@ const app = {
 						return revstr
 					})
 				}
-				str += `\n\n${dashes}\n<i>total winnings:</i> <b>${activity.total_winnings}</b>\n${dashes}\n`
+				str += `\n\n${dashes}\n<i>total winnings:</i> <b>${activity.total_winnings}</b>\n<i>paid winnings:</i> <b>${activity.paid_winnings}</b>\n${dashes}\n`
 				return str
 			}
 		}
