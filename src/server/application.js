@@ -597,24 +597,26 @@ const app = {
 			roundUser.payoff = PAYOFF_LEAD_WIN
 			app.payoff( users[roundUser.uid], PAYOFF_LEAD_WIN, round.id )			
 		}
-		return
 		// award jurists
-		// for each question / answer
-		round.question_set.forEach( (qnum,qIdx) => {
+		
+		round.question_set.forEach( (qnum,qIdx) => { // for each question / answer
 			let question = analyst_questions[qnum]
-			// check for question used as assessment or disqual
+			// TODO: check for question used as assessment or disqual
 			let tally_answer = tally.answers[qIdx] 
 			if (tally_answer.sway_count < 3) return// no winners for this question
 			let avg_sway = tally_answer.avg_sway
+			console.log(`question ${qnum} avg_sway ${avg_sway}`,tally_answer)
 			// for each round user
 			let distancesum = 0
-			let roundusersdistance = round.users.map( roundUser => {
+			let roundusersdistance = round.users.filter( (_,idx) => idx > 1 ).map( (roundUser,ruIdx) => { // no leads
 				let sway = roundUser.sways[qIdx]
+				console.log(`round user ${ruIdx} ${roundUser.uid} sway `,sway)
 				if (!samesign(sway,avg_sway)) return null
-				let distance = Math.sqrt(Math.abs( n1*n1 - n2*n2))
+				let distance = Math.sqrt(Math.abs( sway * sway - avg_sway * avg_sway ))
 				distancesum += distance				
 				return distance
 			})
+			console.log(`distancesum ${distancesum} -- roundusersdistance`,roundusersdistance)
 			// calculate the percentiles
 			let percentiles = roundusersdistance.map( distance => {
 				if (distance == null) return
