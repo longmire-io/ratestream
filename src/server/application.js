@@ -1059,7 +1059,7 @@ const app = {
 		},{reviews:[],ratings:[]})
 
 		console.log('check winnings',user)
-		let winnings = user.payoffs == undefined ? 0 : user.payoffs.reduce( (winnings,payoff) => { 
+		let winnings = user.payoffs == undefined ? { total:0, paid:0 } : user.payoffs.reduce( (winnings,payoff) => { 
 			winnings.total += payoff.award 
 			if (payoff.paid) winnings.paid += payoff.award
 			return winnings
