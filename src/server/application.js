@@ -110,6 +110,7 @@ const tally_window = WEEK   // window from now to consider tallies (e.g. 1 week)
 
 
 const PAYOFF_LEAD_WIN = 6
+const PAYOFF_JURIST_WIN = 6
 
 
 const parseHtml = { parse_mode:'HTML' } 
@@ -636,13 +637,33 @@ const app = {
 		let percentile_summaries = new Array(round.users.length-2).fill().map( (_, uIdx) => 
 			percentiles.reduce( (accum, uArr, qIdx) => {
 				if (uArr && uArr[uIdx]) {
-					accum.value = (accum.value * accum.count + uArr[uIdx]) / (accum.count+1)
-					accum.count++
+					accum.value = (accum.value * accum.num_answered + uArr[uIdx]) / (accum.num_answered+1)
+					accum.num_answered++
 				}
 				return accum
-			},{count:0,value:0}).value
+			},{num_answered:0,value:0})
 		)
-		console.log(`percentile summaries`,percentile_summaries)
+		let total_answered = percentile_summaries.reduce( (total,summary) => (total + summary.num_answered),0)
+		let total_normalized = 0
+		console.log(`answered ${total_answered} -- percentile summaries`,percentile_summaries)
+		let normalized_scores = percentile_summaries.map( user_summary => {
+			score = user_summary.num_answered / user_summary.value
+			normalized = score / total_answered
+			total_normalized += normalized
+			return normalized
+		})
+		let should_add_to_1 = 0
+		let winnings = normalized_scores.map ( (user_score,uIdx) => {
+			let roundUser = round.users[uIdx+2]
+			percentage_score = user_score / total_normalized
+			should_add_to_1 += percentage_score
+			let winning = PAYOFF_JURIST_WIN * percentage_score 
+			roundUser.payoff = winning
+			app.payoff( users[roundUser.uid], winning, round.id )		
+			return winning
+		})
+		console.log(`should be 1: ${should_add_to_1}`,winnings)
+
 		// Assess winnings for jurists
 			/*     
 			   {
