@@ -598,14 +598,14 @@ const app = {
 			app.payoff( users[roundUser.uid], PAYOFF_LEAD_WIN, round.id )			
 		}
 		// award jurists
-		
+		let percentiles = []
 		round.question_set.forEach( (qnum,qIdx) => { // for each question / answer
 			let question = analyst_questions[qnum]
 			// TODO: check for question used as assessment or disqual
 			let tally_answer = tally.answers[qIdx] 
-			if (tally_answer.sway_count < 3) return// no winners for this question
+			if (tally_answer.sway_count < 3) return // no winners for this question
 			let avg_sway = tally_answer.avg_sway
-			console.log(`question ${qnum} avg_sway ${avg_sway}`,tally_answer)
+			console.log(`question ${qIdx}:${qnum} avg_sway ${avg_sway}`,tally_answer)
 			// for each round user
 			let distancesum = 0
 			let roundusersdistance = round.users.filter( (_,idx) => idx > 1 ).map( (roundUser,ruIdx) => { // no leads
@@ -613,23 +613,28 @@ const app = {
 				console.log(`round user ${ruIdx} ${roundUser.uid} sway `,sway)
 				if (!samesign(sway,avg_sway)) return null
 				let distance = Math.sqrt(Math.abs( sway * sway - avg_sway * avg_sway ))
-				distancesum += distance				
+				distancesum += distance
 				return distance
 			})
 			console.log(`distancesum ${distancesum} -- roundusersdistance`,roundusersdistance)
 			// calculate the percentiles
-			let percentiles = roundusersdistance.map( distance => {
-				if (distance == null) return
-				return distance / distancesum 			
+			percentiles[qIdx] = roundusersdistance.map( distance => {
+				if (distance == null || distancesum == 0) return null
+				return distance / distancesum
 			})
-			console.log(`percentiles for question ${qIdx}`,percentiles)
-
 		//convert to winnings 10,25,50 of PAYOFF_JURIST_WIN			
-
 		})
-
-
-
+		console.log(`percentiles `,percentiles)
+		let percentile_summaries = new Array(round.users.length-2).fill().map( (_, uIdx) => 
+			percentiles.reduce( (accum, uArr, qIdx) => {
+				if (uArr && uArr[uIdx]) {
+					accum.value = (accum.value * accum.count + uArr[uIdx]) / (accum.count+1)
+					accum.count++
+				}
+				return accum
+			},{count:0,value:0}).value
+		)
+		console.log(`percentile summaries`,percentile_summaries)
 		// Assess winnings for jurists
 			/*     
 			   {
