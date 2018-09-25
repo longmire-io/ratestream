@@ -37,9 +37,17 @@ token_classify.sectors.forEach( sector => console.log(sector.name) )
 
 var { rounds, users } = appData
 var { tokens, coinmarket_ids } = tokenData
+/*
+tokens.forEach( (token,tIdx) => {
+	tokens[tIdx] = { id:tIdx, ...token } // = { id:tIdx, ...token } // fix tokens
+	tokens[tIdx].tallies = [] // clear tallies	
+})
+*/
+
 var tokens_covered = tokens.reduce( (covered,token,tIdx) => {
-	//tokens[tIdx] = { id:tIdx, ...token } // 
-	if (token.tags && (token.tags.includes('top') || token.tags.includes('mover'))) covered.push( tIdx )
+	token.tags = token.tags || []
+	if ( token.tags.includes('top') || token.tags.includes('mover') ) 
+		covered.push( tIdx )
 	return covered
 }, [])
 
@@ -395,7 +403,7 @@ const app = {
 					token.tallies = token.tallies.filter( tallycheck => tally.round !== tallycheck.round )
 					token.tallies.push(tally) // only keep one tally per round
 				}
-				console.log('tally',tally)
+				//console.log('tally',tally)
 			}
 			//console.log('done')
 			// Expire reviewers and raters if due
@@ -986,16 +994,16 @@ const app = {
 		},'')
 	},
 	userActivity: user => {
-		console.log('get user activity',user)
+		console.log('get user activity',user.id)
 		let roundsData = rounds.reduce( (output, round) => {
 			console.log('round',round)
 			let roundUserIdx = round.users.findIndex( rounduser => rounduser.uid == user.id )
 			if (roundUserIdx == -1) return output
 
-			console.log('get round info',round)
+			console.log('get round info',round.id)
 			roundUser = round.users[roundUserIdx]
 			if (roundUserIdx < 2) {
-				console.log('review',round,roundUserIdx,roundUser)
+				console.log('review') // ,roundUserIdx,roundUser)
 
 				output.reviews.push({
 					id: round.id,
@@ -1013,7 +1021,7 @@ const app = {
 					},
 					winnings: 0
 				})
-				console.log('review output',output)
+				//console.log('review output',output)
 			} else { // rating
 				console.log('rating')
 				output.ratings.push({
@@ -1032,11 +1040,13 @@ const app = {
 			return output
 		},{reviews:[],ratings:[]})
 
-		let winnings = user.payoffs.reduce( (winnings,payoff) => { 
+		console.log('check winnings',user)
+		let winnings = user.payoffs == undefined ? 0 : user.payoffs.reduce( (winnings,payoff) => { 
 			winnings.total += payoff.award 
 			if (payoff.paid) winnings.paid += payoff.award
 			return winnings
 		},{ total:0, paid:0 })
+		console.log('done')
 		return { ...roundsData, total_winnings: winnings.total, paid_winnings: winnings.paid }
 		
 		/*
@@ -1790,7 +1800,8 @@ app.saveTokens()
  --- */
 
 const token_name = round => tokens[round.token].name
-app.saveTokens()
+
+//app.saveTokens()
 
 
 module.exports = app
