@@ -551,15 +551,12 @@ const app = {
 		console.log(`round ${round.id} cancel`)
 		app.roundClear( round )
 		round.status = 'cancelled'
-		// app.save()
 	},
 	roundExpire: ( round ) => {
 		// compute sways and points
 		console.log(`round ${round.id} expire`)
-		/* take out for testing
 		app.roundClear( round )
 		round.status = 'finished'
-		*/
 		app.roundWinnings( round ) // assess winnings
 	},
 	roundRole: ( round, user ) => ( 
@@ -589,8 +586,7 @@ const app = {
 			return tally
 		},{}) */
 		if (!tally) return
-		console.log(`got tally for round ${round.id} and token ${round.token}:${tokens[round.token].name}`,tally)
-
+		//console.log(`got tally for round ${round.id} and token ${round.token}:${tokens[round.token].name}`,tally)
 
 		// award lead winner
 		let counts = tally.categories.reduce( (counts, category) => {
@@ -600,12 +596,13 @@ const app = {
 		},[0,0])
 		console.log('got counts',counts)
 		round.winner = counts[0] === counts[1] ? null : (counts[0] > counts[1] ? 0 : 1) 
-		console.log('round winner',round.winner,' user ',round.users[round.winner].uid)
 		if (round.winner !== null) {
+			console.log('round winner',round.winner,' user ',round.users[round.winner].uid)
 			let roundUser = round.users[round.winner]
 			roundUser.payoff = PAYOFF_LEAD_WIN
 			app.payoff( users[roundUser.uid], PAYOFF_LEAD_WIN, round.id )			
 		}
+
 		// award jurists
 		let percentiles = []
 		round.question_set.forEach( (qnum,qIdx) => { // for each question / answer
@@ -634,6 +631,7 @@ const app = {
 		//convert to winnings 10,25,50 of PAYOFF_JURIST_WIN			
 		})
 		console.log(`percentiles `,percentiles)
+		if (!percentiles.length) return // no valid entries
 		let percentile_summaries = new Array(round.users.length-2).fill().map( (_, uIdx) => 
 			percentiles.reduce( (accum, uArr, qIdx) => {
 				if (uArr && uArr[uIdx]) {
@@ -652,17 +650,16 @@ const app = {
 			total_normalized += normalized
 			return normalized
 		})
-		let should_add_to_1 = 0
+
 		let winnings = normalized_scores.map ( (user_score,uIdx) => {
 			let roundUser = round.users[uIdx+2]
 			percentage_score = user_score / total_normalized
-			should_add_to_1 += percentage_score
 			let winning = PAYOFF_JURIST_WIN * percentage_score 
 			roundUser.payoff = winning
 			app.payoff( users[roundUser.uid], winning, round.id )		
 			return winning
 		})
-		console.log(`should be 1: ${should_add_to_1}`,winnings)
+		console.log(`winnings:`,winnings)
 
 		// Assess winnings for jurists
 			/*     
