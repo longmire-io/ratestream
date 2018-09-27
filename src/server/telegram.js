@@ -175,28 +175,31 @@ bot.onText(/\/token /i, msg => {
 /* internal use, admin only */
 
 bot.onText(/\/clearRounds/i,msg => { // beware, clears all rounds, really
-	tell(msg.chat.id, say('roundsClear'))
+	tell(msg.chat.id, say('roundsClear', { user }))
 })
 
-bot.onText(/\/ratings/, msg => tell( msg.chat.id, say('ratings') ) )
+bot.onText(/\/ratings/, msg => tell( msg.chat.id, say('ratings', { user: identifyUser( msg ) } ) ) )
 
-bot.onText(/\/refreshTokens/, msg => tell( msg.chat.id, say('tokens_refresh') ) )
+bot.onText(/\/refreshTokens/, msg => tell( msg.chat.id, say('tokens_refresh', { user: identifyUser( msg ) } ) ) )
 
-bot.onText(/\/refreshInfo/, msg => tell( msg.chat.id, say('news_refresh') ) )
+bot.onText(/\/refreshInfo/, msg => tell( msg.chat.id, say('news_refresh', { user: identifyUser( msg ) } ) ) )
 
-bot.onText(/\/refreshTopTokens/, msg => tell( msg.chat.id, say( 'tokens_top') ) )
+bot.onText(/\/refreshTopTokens/, msg => tell( msg.chat.id, say( 'tokens_top', { user: identifyUser( msg ) } ) ) )
 
-bot.onText(/\/time/, msg => tell( msg.chat.id, say('time') ) )
+bot.onText(/\/time/, msg => tell( msg.chat.id, say('time', { user: identifyUser( msg ) } ) ) )
 
 bot.onText(/\/cron/, msg => { // specified in hours if want to specify
 	const fields = msg.text.split(' ')
 	console.log('fields',fields)
 	const delta = fields.length == 1 ? 3600 : +fields[1]
 	//console.log('delta is',delta)
-	tell( msg.chat.id, say('cron',{delta:delta}) )
+	tell( msg.chat.id, say('cron',{ delta, user:identifyUser( msg )} ) )
 })
 
-bot.onText(/\/tally/i, msg => tell( msg.chat.id, say('tally') ) )
+bot.onText(/\/tally/i, msg => tell( msg.chat.id, say('tally', { user: identifyUser( msg ) } ) ) )
+
+/* --- admin */
+
 
 // fix these?
 bot.onText(/\/testAddReviewers/, msg => {	
@@ -269,7 +272,7 @@ bot.on('message', msg => {
 				if (q[1] == 'category') {
 					let catIdx = +q[2]
 					tell(msg.chat.id, say('review_category',{ user, category:catIdx, text:msg.text.toString() }) ).then( () => {
-						tell( msg.chat.id, say( 'review_categories', {user} ) )
+						tell( msg.chat.id, say( 'review_categories', { user } ) )
 					})
 				}
 				break
@@ -286,7 +289,7 @@ bot.on('message', msg => {
 			case 'news':
 				app.topNewsByCoin('monero').then( articles => console.log(articles) )
 			case 'cmds':
-				tell(msg.chat.id, say('commands'))
+				tell(msg.chat.id, say('commands', { user }))
 				break
 			case 'tokens':
 				tell( msg.chat.id, say('tokens') )

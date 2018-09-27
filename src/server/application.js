@@ -65,6 +65,10 @@ const question_winnings = {
 
 var testUsers = users.filter( user => user.first_name.startsWith('tester_'))
 
+/*users.forEach( user => {
+	user.roles = ["ryoungblom","alan_on40"].includes( user.username ) ? ['admin','user'] : ['user']
+})
+*/
 //const dialogs = require('./dialogs')
 //const formatters = require('./bots/formatters')
 
@@ -79,9 +83,16 @@ const commands = [
 	'rate',
 	'activity',	// includes rounds you are and have been involved in, and outcomes
 	'news',
-	'token <name>',
-	'tokens',
+	'portfolio',
+	'token <name | id>',
+	'tokens <id>',
 	'summaries',
+	'questions'
+]
+
+const commands_admin = [
+	'tally',
+	'ratings',
 	'refreshInfo',
 	//'refreshTokens',
 	'refreshTopTokens',
@@ -661,157 +672,6 @@ const app = {
 		})
 		console.log(`winnings:`,winnings)
 
-		// Assess winnings for jurists
-			/*     
-			   {
-          round: 3,
-          "timestamp": 1516252940,
-          "answers": [
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 2,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 2,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 2,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 1,
-              "avg_sway": 2,
-              "winner": 0
-            }
-          ],
-          "categories": [
-            {
-              "count": 0,
-              "avg": 0,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 0,
-              "avg": 0,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 2,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 0,
-              "avg": 0,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 2,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 2,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 2,
-              "avg": 3,
-              "sway_count": 0,
-              "avg_sway": 0,
-              "winner": null
-            },
-            {
-              "count": 1,
-              "avg": 3,
-              "sway_count": 1,
-              "avg_sway": 2,
-              "winner": 0
-            }
-          ]
-        } */
-
 	},
 	roundsClear: () => { // clear all rounds...beware!
 		appData.rounds = []
@@ -938,6 +798,7 @@ const app = {
 			last_name: 			t_user.last_name,
 			username: 			t_user.username, 
 			language_code: 	t_user.language_code, 
+			role: ['user'],
 			active_jury_round:-1,
 			active_review_round:-1
 		}
@@ -1066,32 +927,6 @@ const app = {
 		},{ total:0, paid:0 })
 		console.log('done')
 		return { ...roundsData, total_winnings: winnings.total, paid_winnings: winnings.paid }
-		
-		/*
-		{ 
-			reviews: [{
-				id:
-				role:
-				start:
-				finish:
-				review_start:
-				review_finish:
-				win_pctg:{
-					answers:
-					categories:
-				}
-				winnings: 2
-			},{...}],
-			ratings:[
-				id:
-				start:
-				finish:
-				winnings:
-			]
-			
-			
-		}
-		*/
 
 	},
 	say: (command, data = {}) => { // command processor for the app
@@ -1105,12 +940,15 @@ const app = {
 		let question
 		let phase
 		let token
+		
+		let isAdmin = () => user.roles.includes('admin')
+		let err = { text: 'sorry' }
 
 		//var ret = (text,format) => ({ text:text, format:format })
 		console.log(`command is ${command}`,data)
 		switch (command) {
 			case 'commands': 
-				retval = { text: dialogs['commands'].text() }
+				retval = { text: dialogs['commands'].text({ user }) }
 				break
 			case 'activity':
 				let activity = app.userActivity( user )
@@ -1122,22 +960,30 @@ const app = {
 			case 'news':
 				break
 			case 'news_refresh':
-				app.refreshInfo()
-				retval = { text: dialogs['news.refresh'].text() }
+				if (isAdmin()) {
+					app.refreshInfo()
+					retval = { text: dialogs['news.refresh'].text() }
+				} else retval = err
 				break
 			case 'ratings':
-				app.ratingsUpdate()
-				retval = { text: dialogs['token.ratings'].text() }
+				if (isAdmin()) {
+					app.ratingsUpdate()
+					retval = { text: dialogs['token.ratings'].text() }
+				} else retval = err
 				break
 			case 'summaries':
 				break
 			case 'cron':
-				app.cron( data.delta )
-				retval = { text: formatters.apptime( app.time() ) }
+				if (isAdmin()) {
+					app.cron( data.delta )
+					retval = { text: formatters.apptime( app.time() ) }					
+				} else retval = err
 				break
 			case 'time':
-				console.log('time')
-				retval = { text: formatters.apptime( app.time() ) }
+				if (isAdmin()) {
+					console.log('time')
+					retval = { text: formatters.apptime( app.time() ) }				
+				} else retval = err
 				break
 			case 'rate':
 				console.log('rate',user)
@@ -1173,9 +1019,11 @@ const app = {
 				break
 
 			case 'roundsClear':
-				console.log('rounds clear')
-				app.roundsClear()
-				retval = { text: dialogs['rounds.clear'].text() }
+				if (isAdmin()) {
+					console.log('rounds clear')
+					app.roundsClear()
+					retval = { text: dialogs['rounds.clear'].text() }
+				} retval = err
 				break
 			case 'questions':
 				retval = { text: formatters.analyst_questions( analyst_questions ) }
@@ -1189,7 +1037,6 @@ const app = {
 					format: formatters.analyst_question(analyst_questions[roundUser.question],roundUser.question),
 					parse:parseHtml
 				}
-
 				break
 			case 'question_answer': // answered question
 				question_number = data.question_number
@@ -1248,24 +1095,34 @@ const app = {
 				retval = { text:dialogs['tokens'].text(), format:formatters.tokens(  tokensDisplay, tokens ) }
 				break
 			case 'token_ids':
-				app.refreshTokenIds()
-				retval = { text: 'ids refreshing' }
+				if (isAdmin()) {
+					app.refreshTokenIds()
+					retval = { text: 'ids refreshing' }
+				} else retval = err
 				break
 			case 'token_quotes':
-				app.refreshTokenQuotes( data.ids ) // needs ids
-				retval = { text: 'quotes refreshing' }
+				if (isAdmin()) {
+					app.refreshTokenQuotes( data.ids ) // needs ids
+					retval = { text: 'quotes refreshing' }
+				} else retval = err 
 				break
 			case 'token_tickers':
-				app.refreshTokenTickers()
-				retval = { text: 'tickers refreshing' }
+				if (isAdmin()) {
+					app.refreshTokenTickers()
+					retval = { text: 'tickers refreshing' }
+				} else retval = err
 				break
 			case 'tokens_refresh':
-				app.refreshTokens() // can do this on regular interval
-				retval = { text:dialogs['tokens.refresh'].text() }
+				if (isAdmin()) {
+					app.refreshTokens() // can do this on regular interval
+					retval = { text:dialogs['tokens.refresh'].text() }					
+				} else retval = err
 				break
 			case 'tokens_top':
-				app.refreshTopTokens()
-				retval = { text: dialogs['tokens.top'].text() }
+				if (isAdmin()) {
+					app.refreshTopTokens()
+					retval = { text: dialogs['tokens.top'].text() }
+				} else retval = err
 				break
 			case 'token':
 				let tokenId = Number.isInteger(data.id) ? data.id : app.getTokenId( data.name )
@@ -1360,8 +1217,10 @@ const app = {
 				retval = { text: `review submitted for <b>${catName}</b>`, parse:parseHtml }
 				break
 			case 'tally':
-				app.roundsAssess()
-				retval = { text: 'rounds assessed' }
+				if (isAdmin()){
+					app.roundsAssess()
+					retval = { text: 'rounds assessed' }					
+				} retval = err
 				break
 			default: 
 				console.log(`unknown command ${command}`)
@@ -1378,7 +1237,10 @@ const app = {
 
 	dialogs: {
 		'commands': {
-			text: () => commands.reduce( ( result, command ) => (`${result}\n/${command}`), '')
+			text: ( { user } ) => (
+				commands.reduce( ( result, command ) => (`${result}\n/${command}`), '')
+				+ (user.roles.includes('admin') ? '\n\n--admin only--\n'+commands_admin.reduce( ( result, command ) => (`${result}\n/${command}`), '') : '')
+			)				
 		},
 		'welcome.new': {
 			text: ({ user }) => `Welcome ${user.first_name}...what you can do with ratestream:`
@@ -1624,7 +1486,7 @@ const app = {
 	   	return { reply_markup:{ inline_keyboard: ik } }
 		},
 		analyst_questions: ( questions ) => (
-			questions.reduce( (str, question, num) => ( `${str}${num+1}. ${question.text}\n` ), "")
+			questions.reduce( (str, question, num) => ( `${str}${num+1}. ${question.text instanceof Object ? question.text.pre : question.text }\n` ), "")
 		),
 		reviewer_categories: ( categories ) => {
 			let ik = []
@@ -1821,6 +1683,7 @@ const token_name = round => tokens[round.token].name
 
 //app.saveTokens()
 
+app.save()
 
 module.exports = app
 
