@@ -8,16 +8,16 @@
             "keywords": [],
             "filter": null,
             "gambits": [
-                "dgvt8fRn",
-                "onlaKCPA",
-                "3jMhObot",
-                "Kk5qVQor",
-                "QCYbHabE"
+                "D4YLurk6",
+                "Jc1OQppY",
+                "QcKaDakO",
+                "dqEuxQVn",
+                "tr0WjNza"
             ]
         }
     },
     "gambits": {
-        "dgvt8fRn": {
+        "D4YLurk6": {
             "trigger": {
                 "flags": {},
                 "filter": "^hasTag('hello')",
@@ -26,35 +26,35 @@
                 "clean": "\\s*((?:[^\\s]+\\s+){0,1}(?:[^\\s]+)?)\\s*"
             },
             "replies": [
-                "U2JDysFl",
-                "GXcDWFGV",
-                "W2DIQsho",
-                "4esbdpby",
-                "u9xicCzI",
-                "4bj5nwrb",
-                "egKfOxiS",
-                "Vtc5r2fW"
+                "sHSmhct4",
+                "lmF60tDl",
+                "BWne2ZAc",
+                "BM9iFviM",
+                "zQffdGSF",
+                "2tkhD0lz",
+                "oevBOk4f",
+                "YI04DVA4"
             ],
             "conditional": null,
             "conversation": null,
             "topic": "random"
         },
-        "onlaKCPA": {
+        "Jc1OQppY": {
             "trigger": {
                 "flags": {},
                 "filter": null,
                 "question": false,
-                "raw": "* weather in <name>",
-                "clean": "(?:(?=^|\\s)\\s*(?:.*)(?=\\s|$)\\s*)?weather in <name>"
+                "raw": "* weather in",
+                "clean": "(?:(?=^|\\s)\\s*(?:.*)(?=\\s|$)\\s*)?weather in"
             },
             "replies": [
-                "h0JeiJcj"
+                "zj53ajrx"
             ],
             "conditional": null,
             "conversation": null,
             "topic": "random"
         },
-        "3jMhObot": {
+        "QcKaDakO": {
             "trigger": {
                 "flags": {},
                 "filter": null,
@@ -63,13 +63,13 @@
                 "clean": "i go by(?=^|\\s)\\s*(bus|train|car)(?=\\s|$)\\s*"
             },
             "replies": [
-                "AjhTZfo4"
+                "H1MB3R5z"
             ],
             "conditional": null,
             "conversation": null,
             "topic": "random"
         },
-        "Kk5qVQor": {
+        "dqEuxQVn": {
             "trigger": {
                 "flags": {},
                 "filter": null,
@@ -78,13 +78,13 @@
                 "clean": "i(?=^|\\s)\\s*(please|cotton|prefer|care for|love|like)(?=\\s|$)\\s*(?=^|\\s)\\s*(funambulism|rock climbing|contact sport|outdoor sport|gymnastics|track and field|skiing|water sport|rowing|archery|sledding|skating|racing|riding|cycling|blood sport|athletic game|judo|spectator sport|team sport|professional boxing|professional wrestling|sumo|professional golf|professional football|professional baseball|professional basketball|professional tennis|freak|jocosity|waggery|drollery|pun|sport)(?=\\s|$)\\s*"
             },
             "replies": [
-                "grKMa82G"
+                "FGQxwAEF"
             ],
             "conditional": null,
             "conversation": null,
             "topic": "random"
         },
-        "QCYbHabE": {
+        "tr0WjNza": {
             "trigger": {
                 "flags": {},
                 "filter": null,
@@ -93,7 +93,7 @@
                 "clean": "my(?:(?:\\s|\\b)+(?:big)(?:\\s|\\b)+|(?:\\s|\\b)+)red balloon(?:(?:\\s|\\b)+(?:is awesome)(?:\\s|\\b)+|(?:\\s|\\b)+)"
             },
             "replies": [
-                "H7g6hd6e"
+                "8q7Jdhy8"
             ],
             "conditional": null,
             "conversation": null,
@@ -101,69 +101,69 @@
         }
     },
     "replies": {
-        "U2JDysFl": {
+        "sHSmhct4": {
             "string": "Hi!",
             "filter": null,
             "keep": false
         },
-        "GXcDWFGV": {
+        "lmF60tDl": {
             "string": "Hi, how are you?",
             "filter": null,
             "keep": false
         },
-        "W2DIQsho": {
+        "BWne2ZAc": {
             "string": "How are you?",
             "filter": null,
             "keep": false
         },
-        "4esbdpby": {
+        "BM9iFviM": {
             "string": "Hello",
             "filter": null,
             "keep": false
         },
-        "u9xicCzI": {
+        "zQffdGSF": {
             "string": "Howdy",
             "filter": null,
             "keep": false
         },
-        "4bj5nwrb": {
+        "2tkhD0lz": {
             "string": "Ola",
             "filter": null,
             "keep": false
         },
-        "egKfOxiS": {
+        "oevBOk4f": {
             "string": "Gazurkelpoodlin",
             "filter": null,
             "keep": false
         },
-        "Vtc5r2fW": {
+        "YI04DVA4": {
             "string": "paddoodle",
             "filter": null,
             "keep": false
         },
-        "h0JeiJcj": {
-            "string": "^getWeather(<cap1>)",
+        "zj53ajrx": {
+            "string": "fuck me ^getSeason()",
             "filter": null,
             "keep": false
         },
-        "AjhTZfo4": {
+        "H1MB3R5z": {
             "string": "that's great",
             "filter": null,
             "keep": false
         },
-        "grKMa82G": {
+        "FGQxwAEF": {
             "string": "good for you that you like that",
             "filter": null,
             "keep": false
         },
-        "H7g6hd6e": {
+        "8q7Jdhy8": {
             "string": "glad you have one",
             "filter": null,
             "keep": false
         }
     },
     "checksums": {
-        "./chat/main.ss": "b7d16d6a807803ac293941f8561983962ac36ae7"
+        "./chat/main.ss": "4aaffaf86ce4bcdf1e39c72818d868625e86aa68"
     },
     "version": 1
 }

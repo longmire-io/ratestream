@@ -8,8 +8,8 @@
 - Gazurkelpoodlin
 - paddoodle
 
-+ * weather in <name>
-- ^getWeather(<cap1>)
++ * weather in
+- fuck me ^getSeason()
 
 
 + i go by (bus|train|car)

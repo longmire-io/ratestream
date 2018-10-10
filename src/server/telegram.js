@@ -4,6 +4,7 @@ const TelegramBot = require('node-telegram-bot-api')
 const { InlineKeyboard, ReplyKeyboard, ForceReply } = require('telegram-keyboard-wrapper')
 
 
+/*
 const ss_options = {
   factSystem: {
     clean: true,
@@ -15,7 +16,7 @@ superscript.setup(ss_options, (err, ssbot) => {
   if (err) {
     console.error(err);
   }
-
+*/
 
 
 	const { translate } = require('./nlp')
@@ -327,16 +328,21 @@ superscript.setup(ss_options, (err, ssbot) => {
 	})
 
 	// Conversation bot
-	bot.on('message', msg => {
+	/*bot.on('message', msg => {
 		const fromId = msg.from.id
     const text = msg.text.trim()
+    console.log(`message to ss: ${text}`)
 		ssbot.reply(fromId, text, (err, reply) => {
+			if (err) {
+				console.log(`got error ${err}`)
+			}
 			if (reply.string) {
   			bot.sendMessage(msg.from.id, reply.string)
 			}
 		})
 	})
-})
+*/
+// }) superscript
 /* misc examples / dumping ground */
 /*
 bot.onText(/\/sendpic/, msg => {

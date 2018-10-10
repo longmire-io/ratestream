@@ -4,6 +4,11 @@ const moment = require('moment')
 
 const config = require('./config')
 
+function* entries(obj) { // object iterator
+	for (let key of Object.keys(obj)) 
+		yield [key, obj[key]]
+}
+
 const roundsService = require('../app/services/API/rounds')
 const cyclesService = require('../app/services/API/cycles')
 const tokensService = require('../app/services/API/tokens')
@@ -43,6 +48,30 @@ tokens.forEach( (token,tIdx) => {
 	tokens[tIdx].tallies = [] // clear tallies	
 })
 */
+// mock token ratings
+const mockRatings = () => tokens.forEach( token => {
+	if (!token.rating) return
+	for (let [currprev,periods] of entries(token.rating)) {
+		if (currprev == 'timestamp'){
+			token.rating.timestamp = now
+		}
+		else for (let [period,assessments] of entries(periods)) {
+			assessments.answers.forEach( answer => {
+				if (!answer.count) {
+					answer.count = 25
+					answer.avg = Math.random(5)
+				}
+			})
+			assessments.categories.forEach( category => {
+				if (!category.count) {
+					category.count = 105
+					category.avg = Math.random(5)
+				}
+			})
+		}
+	}
+})
+mockRatings()
 
 var tokens_covered = tokens.reduce( (covered,token,tIdx) => {
 	token.tags = token.tags || []
@@ -128,10 +157,7 @@ const parseHtml = { parse_mode:'HTML' }
 
 const dashes = '------------------------'
 
-function* entries(obj) { // object iterator
-	for (let key of Object.keys(obj)) 
-		yield [key, obj[key]]
-}
+
 
 const fetchToken = address => new Promise( (resolve, reject) => {
 	ethplorer.getTokenInfoExt(address).then( result => {
@@ -533,6 +559,9 @@ const app = {
 			tokens[key].rating = value
 			tokens[key].rating.timestamp = now
 		} 
+		
+		mockRatings() // fills in unfilled ratings
+
 		app.saveTokens()
 		app.save()
 		
