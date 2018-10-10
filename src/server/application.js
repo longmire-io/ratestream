@@ -59,13 +59,13 @@ const mockRatings = () => tokens.forEach( token => {
 			assessments.answers.forEach( answer => {
 				if (!answer.count) {
 					answer.count = 25
-					answer.avg = Math.random(5)
+					answer.avg = Math.random() * 5
 				}
 			})
 			assessments.categories.forEach( category => {
 				if (!category.count) {
 					category.count = 105
-					category.avg = Math.random(5)
+					category.avg = Math.random() * 5
 				}
 			})
 		}
