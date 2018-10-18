@@ -2,7 +2,7 @@
   import { AnimatedView } from '../../components'
   import { store } from '../../Root'
   import config from '../../config/appConfig'
-  import TestTokenERC20Contract from '../../../../build/contracts/vevaTest.json'
+  //import TestTokenERC20Contract from '../../../../build/contracts/vevaTest.json'
 
 
 /*
