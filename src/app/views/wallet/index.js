@@ -21,7 +21,7 @@
   console.log(address);
 
   var accounts;
-  var vevaBalance;
+  var LMRBalance;
   var fromWeiOne;
   var fromWeiTwo;
 
@@ -52,7 +52,7 @@
           console.log (web3.fromWei(toStringNum, 'ether'));
           console.log ('dkssagjsjfdsgdsfkjghskdlfjghsfdkljghskldfgjhslfdg');
 
-          vevaBalance = web3.fromWei(toStringNum, 'ether');
+          LMRBalance = web3.fromWei(toStringNum, 'ether');
 
         }
 
@@ -60,7 +60,7 @@
           fromWeiOne = contractInstance.balanceOf(web3.eth.defaultAccount).c[0].toString();
           fromWeiTwo = contractInstance.balanceOf(web3.eth.defaultAccount).c[1].toString();
 
-          vevaBalance = web3.fromWei(fromWeiOne+fromWeiTwo, 'ether');
+          LMRBalance = web3.fromWei(fromWeiOne+fromWeiTwo, 'ether');
         }
       }
     }
@@ -77,8 +77,8 @@
           <main className="container">
             <div className="pure-g">
               <div className="pure-u-1-1">
-                <h1>VEVA Wallet</h1>
-                <p><strong>Hello!</strong> Welcome to your <span className="dog">Veva Token</span> wallet.</p>
+                <h1>Longmire Wallet</h1>
+                <p><strong>Hello!</strong> Welcome to your <span className="dog">LMR Token</span> wallet.</p>
                 <p>You have in your wallet.</p>
               </div>
             </div>
@@ -120,18 +120,18 @@
 
         var amountWei = web3.toWei(amount);
 
-        if (Number(amount) <= Number(vevaBalance)) {
+        if (Number(amount) <= Number(LMRBalance)) {
 
           contractInstance.transfer(toAddress, amountWei, {from: web3.eth.defaultAccount});
 
-          alert ("You have successfully transferred " + amount + " VEVA to " + toAddress + " !")
+          alert ("You have successfully transferred " + amount + " LMR to " + toAddress + " !")
           console.log (toAddress, amount);
-          console.log ("hurray!  You sent" + amount + " VEVA tokens to " + toAddress);
+          console.log ("hurray!  You sent" + amount + " LMR tokens to " + toAddress);
         }
 
         else {
 
-        alert("So sorry! You don't have enough VEVA tokens to send! Please try transferring  a different amount.");
+        alert("So sorry! You don't have enough Longmire tokens to send! Please try transferring  a different amount.");
         console.log ("Insufficient Balance");
         }
       }
@@ -141,7 +141,7 @@
 
       if ((toAddress.length == 42) && (toAddress[0] == '0') && (toAddress[1] == 'x' || toAddress[1] == "X") && (Number(amount)<=0)){
 
-        alert("Please enter a valid amount of VEVA tokens!");
+        alert("Please enter a valid amount of Longmire tokens!");
         console.log ("invalid amount")
       }
 
