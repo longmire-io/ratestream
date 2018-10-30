@@ -1,5 +1,5 @@
 export const navigation = {
-  brand:      'Veva',
+  brand:      'Longmire',
   leftLinks:  [],
   rightLinks: [
     {

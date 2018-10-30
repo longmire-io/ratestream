@@ -5,7 +5,7 @@ import React                from 'react';
 import {render}             from 'react-dom';
 import { AppContainer }     from 'react-hot-loader';
 import smoothScrollPolyfill from 'smoothscroll-polyfill';
-import injectTpEventPlugin  from 'react-tap-event-plugin';
+//import injectTpEventPlugin  from 'react-tap-event-plugin';
 import 'animate.css';
 import 'jquery';
 import 'font-awesome/css/font-awesome.min.css';
@@ -25,7 +25,7 @@ const BootstrappedElement    = document.getElementById(ELEMENT_TO_BOOTSTRAP);
 
 // #region polyfills initializations
 // tap events
-injectTpEventPlugin();
+//injectTpEventPlugin();
 
 // smoothscroll polyfill
 smoothScrollPolyfill.polyfill();

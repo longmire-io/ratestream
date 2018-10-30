@@ -34,7 +34,7 @@ class AnalystRounds extends Component {
             return <div className="row" key={idx}>
               <div className="col-md-3"><Link to={'/token/'+token.id}>{token.name}</Link></div>
               <div className="col-md-3">{toDate(config.cycleTime(round.cycle))}</div>
-              <div className="col-md-6">{roundReward.value}&nbsp;Veva Tokens</div>
+              <div className="col-md-6">{roundReward.value}&nbsp;LMR Tokens</div>
             </div>
           }
           )}

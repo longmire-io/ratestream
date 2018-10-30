@@ -14,7 +14,7 @@ class AnalystPayouts extends Component {
     return (
       <Panel className="panel-active card card-style">
 
-        <Panel.Heading className="card-title"><i className="fa fa-certificate"/>&nbsp;Veva Wallet</Panel.Heading>
+        <Panel.Heading className="card-title"><i className="fa fa-certificate"/>&nbsp;Longmire Wallet</Panel.Heading>
 
         <Panel.Body className="card-text">
 

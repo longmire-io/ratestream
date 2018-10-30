@@ -8,7 +8,7 @@ const RatingAgencyContract = require('../../../build/contracts/RatingAgency.json
 const AnalystRegistryContract = require('../../../build/contracts/AnalystRegistry.json')
 
 const LmrTokenContract = require('../../../build/contracts/LmrToken.json')
-const LongmireHolder = require('../../../build/contracts/LongmireHolder.json')
+const LongmireHolderContract = require('../../../build/contracts/LongmireHolder.json')
 const LongmireSaleContract = require('../../../build/contracts/LongmireSale.json')
 
 module.exports = {
@@ -24,7 +24,7 @@ module.exports = {
       if (error) return reject( console.error(error) )
 
       instanceContract.defaults( typeof window == 'undefined' ? 
-        { from: coinbase, gas: config.ETHEREUM.gas, gasPrice: config.ETHEREUM.gasPrice } : 
+        { from: coinbase, gas: config.ETHEREUM.gas, gasPrice: config.ETHEREUM.gasPrice, nonce: config.ETHEREUM.nonce, } : 
         { from:coinbase }
       )
 
@@ -38,15 +38,15 @@ module.exports = {
 
   //getTestTokenERC20: addr => module.exports.getContractInstance( TestTokenERC20Contract, addr ),
 
-  getRatingAgency: addr => module.exports.getContractInstance( RatingAgencyContract, addr ), //, appConfig.RATING_AGENCY )
+  getRatingAgency: addr => module.exports.getContractInstance( RatingAgencyContract ), //config.RATING_AGENCY ),
 
-  getAnalystRegistry: addr => module.exports.getContractInstance( AnalystRegistryContract, addr ), //, appConfig.ANALYST_REGISTRY )
+  getAnalystRegistry: addr => module.exports.getContractInstance( AnalystRegistryContract ), //config.ANALYST_REGISTRY ),
 
-  getLmrTokenContract: addr => module.exports.getContractInstance( LmrTokenContract, addr ),
+  getLmrTokenContract: addr => module.exports.getContractInstance( LmrTokenContract ), // addr ),
 
-  getLongmireHolderContract: addr => module.exports.getContractInstance( LongmireHolderContract, addr ),
+  getLongmireHolderContract: addr => module.exports.getContractInstance( LongmireHolderContract ), //addr ),
   
-  getLongmireSaleContract: addr => module.exports.getContractInstance( LongmireSaleContract, addr ) 
+  getLongmireSaleContract: addr => module.exports.getContractInstance( LongmireSaleContract ) //, addr ) 
 }
 
 

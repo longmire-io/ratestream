@@ -1,6 +1,6 @@
 {
   "name": "Longmire-Ratings",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Rating Agency running on decentralized ethereum blockchain",
   "main": "src/index.js",
   "scripts": {
@@ -160,6 +160,7 @@
     "node-fetch": "^2.2.0",
     "normalizr": "^3.3.0",
     "openzeppelin-solidity": "^2.0.0-rc.3",
+    "parse-numeric-range": "0.0.2",
     "pretty-error": "^2.1.1",
     "prop-types": "^15.6.2",
     "qs": "^6.5.2",
@@ -187,7 +188,6 @@
     "react-select": "^1.3.0",
     "react-svg-morph": "^0.2.1",
     "react-tagcloud": "^1.3.1",
-    "react-tap-event-plugin": "^3.0.3",
     "react-test-renderer": "^16.5.2",
     "react-web3": "^0.4.4",
     "react-widgets": "^4.4.6",
@@ -206,6 +206,7 @@
     "survey-react": "^1.0.50",
     "tar-stream": "^1.6.2",
     "truffle-contract": "^3.0.6",
+    "truffle-hdwallet-provider": "^1.0.0-web3one.0",
     "web3": "^0.20.7",
     "zeppelin-solidity": "1.9.0"
   },

@@ -188,7 +188,7 @@ contract RatingAgency {
     /**
      * Constructor
     */
-    constructor( address _registry, uint _period ) public {
+    function RatingAgency( address _registry, uint _period ) public {
         lasttime = ZERO_BASE_TIME;
         time = lasttime;
 
@@ -242,7 +242,7 @@ contract RatingAgency {
             return true;   // one activation per cron
         }
         c.stat = ACTIVE;
-        emit CycleActivated( _cycle, time );
+        CycleActivated( _cycle, time );
         return false;
     }
 
@@ -320,7 +320,7 @@ contract RatingAgency {
             cs.availables[ ref_avail ] = ref;
         }
         //cs.num_volunteers--;
-        emit CycleConfirmed( _cycle, _analyst, _role, ref_avail, cs.num_availables, num_volunteers, num_confirms );
+        CycleConfirmed( _cycle, _analyst, _role, ref_avail, cs.num_availables, num_volunteers, num_confirms );
     }
 
     event CycleAdded( uint16 cycle );
@@ -332,7 +332,7 @@ contract RatingAgency {
             cycles[i].timestart = cycleTime( i );
             cycles[i].period = cycle_period;
             cycles[i].stat = NONE;
-            emit CycleAdded( i );
+            CycleAdded( i );
         }
         num_cycles = num_target;
     }
@@ -349,7 +349,7 @@ contract RatingAgency {
             Cycle storage c = cycles[ cycle ];
             if (c.stat == ACTIVE && c.timestart + c.period <= time ){
                 c.stat = FINISHED;  
-                emit CycleFinished( _cycle, cycle, time );
+                CycleFinished( _cycle, cycle, time );
             } 
         }
         return false;
@@ -445,7 +445,7 @@ contract RatingAgency {
         }
         //cycle.statuses[ _role ].num_volunteers++;
         uint8 num_volunteers = ++cycle.analysts[ ref ].analyst_status[ _role ].num_volunteers;
-        emit CycleVolunteer( _cycle, _analyst, _role, num_volunteers );
+        CycleVolunteer( _cycle, _analyst, _role, num_volunteers );
     }
 
     /*
@@ -472,7 +472,7 @@ contract RatingAgency {
             ra.stat = a<2 ? BRIEF_DUE: PRE_SURVEY_DUE;
             registry.activateRound( ra.analyst, round );
         }       
-        emit RoundActivated( r.cycle, round, num_rounds_active, r.num_analysts );
+        RoundActivated( r.cycle, round, num_rounds_active, r.num_analysts );
     }
 
     function roundAnalyst( uint16 _round, uint32 _analyst ) public view returns ( uint8, uint8, bytes32, bytes32 ) {
@@ -499,13 +499,13 @@ contract RatingAgency {
         Round storage round = rounds[ _round ];
         round.briefs[ _analyst ] = RoundBrief( lasttime, _file);
         round.analysts[ _analyst ].stat = BRIEF_SUBMITTED;
-        emit BriefSubmitted( _round, _analyst, _file );
+        BriefSubmitted( _round, _analyst, _file );
     }
 
     event RoundCancelled( uint16 _cycle, uint16 _round, uint8 _lastState );
     function roundCancel( uint16 _round ) public {
         Round storage round = rounds[ _round ];
-        emit RoundCancelled( round.cycle, _round, round.stat );
+        RoundCancelled( round.cycle, _round, round.stat );
         rounds[ _round ].stat = CANCELLED;
     }
 
@@ -514,7 +514,7 @@ contract RatingAgency {
         rounds[ _round ].stat = FINISHED;
         roundTally( _round );
         num_rounds_active--;
-        emit RoundFinished( rounds[ _round ].cycle, _round, num_rounds_active );
+        RoundFinished( rounds[ _round ].cycle, _round, num_rounds_active );
     }
 
     function roundInfo( uint16 _round ) public view returns (
@@ -564,7 +564,7 @@ contract RatingAgency {
                 ra.stat = SCHEDULED_LEAD;
                 leads_ref[ i ] = ref;
             } else ra.stat = SCHEDULED_JURIST;
-            emit RoundAnalystAdded( _cycle, _round, analyst, round.num_analysts );
+            RoundAnalystAdded( _cycle, _round, analyst, round.num_analysts );
             round.num_analysts++;
 
             if (--num_needed > 0) {
@@ -587,7 +587,7 @@ contract RatingAgency {
             cycleAvailabilityReduce( _cycle, role, ref_avail );
         } while ( i != 0 );
 
-        emit RoundPopulated( _cycle, _round, round.num_analysts, 2 );
+        RoundPopulated( _cycle, _round, round.num_analysts, 2 );
     }
 
 
@@ -642,7 +642,7 @@ contract RatingAgency {
         _answers |= 0x1 << 247; // submit bit
         round.surveys[_analyst][_idx] = RoundSurvey( _answers, _comment );
         analyst.stat = _idx == 0 ? PRE_SURVEY_SUBMITTED : POST_SURVEY_SUBMITTED;
-        emit SurveySubmitted( _round, _analyst, _idx, _answers, _answers[ 1 ], _answers[ 0 ]  );
+        SurveySubmitted( _round, _analyst, _idx, _answers, _answers[ 1 ], _answers[ 0 ]  );
     }
 
     event TallyLog( uint16 round, uint8 analyst, bytes32 avg0, bytes32 avg1, bytes32 sway);
@@ -677,7 +677,7 @@ contract RatingAgency {
                 round.averages[ i ] |= bytes32( uint8(sum[ i ] / n) ) << ( 31 - ibyte ) * 8;
             round.sways |= bytes32( uint8(sway_sum / n) ) << ( 31 - ibyte) * 8;
         }
-        emit TallyLog( _round, aref, round.averages[ 0 ], round.averages[ 1 ], round.sways  );
+        TallyLog( _round, aref, round.averages[ 0 ], round.averages[ 1 ], round.sways  );
         //emit TallyLog( _round, 100, round.r_avg[0], round.r_avg[1] );
 
         // get winner
@@ -693,7 +693,7 @@ contract RatingAgency {
             registry.rewardLead( round.analysts[ i ].analyst, _round, round.value, int8(round.winner == i ? 1 : 0) );
         for ( i = 2; i < round.num_analysts; i++ )
             registry.rewardJurist( round.analysts[ i ].analyst, _round, round.value, 0 ); // for now, every jurist is a winner, pending tally above
-        emit TallyWin( _round, round.winner );
+        TallyWin( _round, round.winner );
     }
 
     // cron
@@ -706,7 +706,7 @@ contract RatingAgency {
         uint16 cycle = cycleIdx( time );
         uint8 phase = cyclePhase( cycle, time );
         
-        emit Cron( lasttime, time, cycle, phase );
+        Cron( lasttime, time, cycle, phase );
 
         if ( time < lasttime ) return; // don't repeat for times already run
         registry.update( time ); // keep time in sync
@@ -790,12 +790,3 @@ contract RatingAgency {
 
 
 
-
-contract Survey {  // "read-only" survey questions
-  uint16 public version = 1;
-  uint16 num_questions = 24;  // num questions not including final
-  string public questions; // ipfs hash for questions json
-  constructor(string _questionsfile) public {
-      questions = _questionsfile;
-  }
-}

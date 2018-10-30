@@ -77,8 +77,8 @@
           <main className="container">
             <div className="pure-g">
               <div className="pure-u-1-1">
-                <h1>VEVA Wallet</h1>
-                <p><strong>Hello!</strong> Welcome to your <span className="dog">Veva Token</span> wallet.</p>
+                <h1>Longmire Wallet</h1>
+                <p><strong>Hello!</strong> Welcome to your <span className="dog">LMR Token</span> wallet.</p>
                 <p>You have in your wallet.</p>
               </div>
             </div>

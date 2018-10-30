@@ -43,7 +43,7 @@ class AnalystStat extends PureComponent {
                     <Stat
                       statFaIconName="fa-certificate"
                       statIconColor="#45cf95"
-                      statLabel={`${analyst.token_balance} Veva Tokens Earned`}
+                      statLabel={`${analyst.token_balance} LMR Tokens Earned`}
                     />
                   </div>
                   <div className="col-md-4">

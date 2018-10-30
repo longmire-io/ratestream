@@ -136,7 +136,7 @@ const message_templates = {
   round_scheduled: {
     link: data => 'scheduling',
     heading: data => <div>Round Scheduled</div>,
-    body: data => <div>A new round has been scheduled to begin <Moment from={data.now}>{data.due}</Moment>. It's worth {data.roundValue} Veva token--interested?</div>,
+    body: data => <div>A new round has been scheduled to begin <Moment from={data.now}>{data.due}</Moment>. It's worth {data.roundValue} LMR token--interested?</div>,
     footer: data => <div>Round Schedule</div>,
     glyph: data => <div className="messageGlyph"><Glyphicon glyph="time"></Glyphicon></div>
   },
@@ -145,7 +145,7 @@ const message_templates = {
   payment: {
     link: data => 'status',
     heading: data => <div>New Payment Available!</div>,
-    body: data => <div>Nice work! You have earned a new payment of {data.tokens} VEVA! Your new balance is {data.balance} VEVA.</div>,
+    body: data => <div>Nice work! You have earned a new payment of {data.tokens} LMR! Your new balance is {data.balance} LMR.</div>,
     footer: data => <div>View Balance</div>,
     glyph: data => <div className="messageGlyph"><Glyphicon glyph="usd"></Glyphicon></div>
   },
@@ -189,7 +189,7 @@ const message_templates = {
   rounds_in_progress:{
     link: data => `round/${data.round}`,
     heading: data => <div>Round In Progress</div>,
-    body: data => <div>A round for <Link to={`/token/${data.tokenId}`}>{data.tokenName}</Link> (began <Moment from={data.now}>{data.start}</Moment>) is in progress.  You are a <span className="text-purple">{config.role_name[data.role]}</span>, and it's worth {data.roundValue} Veva token. </div>,
+    body: data => <div>A round for <Link to={`/token/${data.tokenId}`}>{data.tokenName}</Link> (began <Moment from={data.now}>{data.start}</Moment>) is in progress.  You are a <span className="text-purple">{config.role_name[data.role]}</span>, and it's worth {data.roundValue} LMR token. </div>,
     footer: data => <div>View Round Info</div>,
     glyph: data => <div className="messageGlyph"><Glyphicon glyph="star-empty"></Glyphicon></div>
   },
@@ -197,7 +197,7 @@ const message_templates = {
   sponsored_analyst_joins: {
     link: data => 'status',
     heading: data => <div>New Sponsored Analyst!</div>,
-    body: data => <div>Hurray! One of your referrals (Analyst #{data.analyst}) has joined. Thank you for participating in the Veva ecosystem! You have earned an additional {data.reputation_points} rep points.</div>,
+    body: data => <div>Hurray! One of your referrals (Analyst #{data.analyst}) has joined. Thank you for participating in the Longmire ecosystem! You have earned an additional {data.reputation_points} rep points.</div>,
     footer: data => <div>See on Status Page</div>,
     glyph: data => <div className="messageGlyph"><Glyphicon glyph="heart"></Glyphicon></div>
   },
@@ -213,7 +213,7 @@ const message_templates = {
   make_referral: {
     link: data => 'status',
     heading: data => <div>Reminder: You have unused referrals!</div>,
-    body: data => <div>You have {data.unused_refs} unused referrals. Your referrals help keep the Veva system healthy and secure—and you get a cut of their winnings! </div>,
+    body: data => <div>You have {data.unused_refs} unused referrals. Your referrals help keep the Longmire system healthy and secure—and you get a cut of their winnings! </div>,
     footer: data => <div>Go to Status Page</div>,
     glyph: data => <div className="messageGlyph"><Glyphicon glyph="user"></Glyphicon></div>
   },

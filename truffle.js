@@ -5,7 +5,7 @@ module.exports = {
       host: "localhost", //10.0.0.3", // veva.one"
       port: 8545,
       network_id: "*", // Match any network id
-      from: "0x9F943eD85fb1B63b2a68aF79290e5023D32F5E96",
+      //from: "0x26eae3b5e8d7c061299a6b297e839b396c44887d",
       gas: 6700000 // 4700000  add extra to bootstrap test data
     },
     development_1: {
@@ -49,6 +49,33 @@ module.exports = {
       network_id: "*",
       from: "0x5dfe021f45f00ae83b0aa963be44a1310a782fcc",
       gas: 6700000      
+    },
+    kovan:{
+      host: "34.217.64.52", //http://eth-kovan.longmire.space",
+      port: 8545,
+      network_id: "42",
+      from: "0xa00F1C31819789B7eE5ff28DAbea79b1F566B540",    
+      gas: 4712388,
+      gasPrice: 25000000000  
+    },
+    local:{
+      host: "localhost",
+      port: 8545,
+      gas: 6000000
+    },
+    kovanlocal:{
+      host: "localhost", //http://eth-kovan.longmire.space",
+      port: 8545,
+      network_id: "*",
+      from: "0xa00F1C31819789B7eE5ff28DAbea79b1F566B540",
+      gas: 4700000    
+    },
+    classic:{
+      host: "54.191.97.116", //http://etc-main.longmire.space",
+      port: 8545,
+      network_id: "1",
+      from: "0xcaa7bb3e524c0cc018adc75ef17b89b40b1a17b1",
+      gas: 4700000      
     },
   }
 };

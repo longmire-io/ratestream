@@ -63,6 +63,7 @@ contract AnalystRegistry {
         bytes32 name;
         bytes32 password;
         bytes32 email;
+        bytes32 d_id;    // decentralized id
         uint32 auth_status;  // user authentication status
         uint32 referred_by; // analyst that referred me
         address user_addr;
@@ -99,7 +100,7 @@ contract AnalystRegistry {
     uint256 timenow;
     function update(uint256 _timenow) public { timenow = _timenow; }
 
-    constructor() public {
+    function AnalystRegistry() public {
         levels.push( [  0, 2] );
         levels.push( [ 10, 4] );
         levels.push( [ 50, 6] ); // LEAD_LEVEL
@@ -253,7 +254,7 @@ contract AnalystRegistry {
         address_lookup[ msg.sender ] = num_analysts;
         name_lookup[ _email ] = num_analysts;
 
-        emit Register( num_analysts++, _email, _regcode, a.identity );
+        Register( num_analysts++, _email, _regcode, a.identity );
     }
 
     // move these two to agency contract

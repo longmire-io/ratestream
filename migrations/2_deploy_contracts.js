@@ -1,17 +1,17 @@
-var TokenERC20 = artifacts.require("TokenERC20")
+var LmrToken = artifacts.require("LmrToken")
 var AnalystRegistry = artifacts.require("AnalystRegistry")
 var RatingAgency = artifacts.require("RatingAgency")
-var Tests = artifacts.require("test2")
-var vevaTest = artifacts.require("vevaTest")
+//var Tests = artifacts.require("test2")
+//var vevaTest = artifacts.require("vevaTest")
 
 module.exports = function( deployer ) {
 	deployer.deploy( AnalystRegistry ).then( () => AnalystRegistry.deployed() )
 	.then( registry => deployer.deploy( RatingAgency,registry.address, 0 ) )
 	.then( () => RatingAgency.deployed() )
-	.then( ra => deployer.deploy( Tests, ra.address ) )
-	.then( () => Tests.deployed() )
+	//.then( ra => deployer.deploy( Tests, ra.address ) )
+	//.then( () => Tests.deployed() )
 
-	deployer.deploy( vevaTest ).then( () => vevaTest.deployed() )
+	deployer.deploy( LmrToken ).then( () => LmrToken.deployed() )
 
 	/*
 	deployer.deploy(TokenERC20,10000,"MOOLAH","MOO").then( () => TokenERC20.deployed() )

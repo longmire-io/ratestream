@@ -12,7 +12,7 @@ var web3 = getWeb3() //new Web3(new Web3.providers.HttpProvider("http://localhos
 
 
 var accounts;
-var vevaBalance;
+var tokenBalance;
 var balanceDisplay;
 
 const s = '** **USER** **'
@@ -33,14 +33,14 @@ class ViewWallet extends Component {
 
           eth.getBalance( web3.eth.defaultAccount ).then( balance => console.log(`${s}balance ${balance}`) )
 
-          WalletService.balanceOf( web3.eth.defaultAccount ).then( balance => { vevaBalance = balance.toNumber()})
+          WalletService.balanceOf( web3.eth.defaultAccount ).then( balance => { tokenBalance = balance.toNumber()})
 
         }
       }).catch( err => {
         console.log('error getting accounts')
       })
 
-    this.state = {balanceDisplay: vevaBalance};
+    this.state = {balanceDisplay: tokenBalance};
 
     //this.onItemClick = this.onItemClick.bind(this)
     // test
@@ -61,14 +61,14 @@ class ViewWallet extends Component {
 
           eth.getBalance( web3.eth.defaultAccount ).then( balance => console.log(`${s}balance ${balance}`) )
 
-          WalletService.balanceOf( web3.eth.defaultAccount ).then( balance => { vevaBalance = balance.toNumber()})
+          WalletService.balanceOf( web3.eth.defaultAccount ).then( balance => { tokenBalance = balance.toNumber()})
 
         }
       }).catch( err => {
         console.log('error getting accounts')
       })
 
-      this.state = ({balanceDisplay: vevaBalance});
+      this.state = ({balanceDisplay: tokenBalance});
 
     }, 30000);
 
@@ -77,7 +77,7 @@ class ViewWallet extends Component {
 
 
   componentDidMount() {
-      this.interval = setInterval(() => this.setState({ balanceDisplay: vevaBalance}), 10000);
+      this.interval = setInterval(() => this.setState({ balanceDisplay: tokenBalance}), 10000);
   }
 
 
@@ -99,30 +99,30 @@ class ViewWallet extends Component {
 
         var amountWei = web3.toWei(amount);
 
-        if (amount <= vevaBalance) {
+        if (amount <= tokenBalance) {
 
           WalletService.transfer(toAddress, amountWei).then( transactionResult => {
             console.log('transaction result',transactionResult)
             $("#address").val("")
             $("#amount").val("")
-            this.setState({balanceDisplay: vevaBalance - amount})
+            this.setState({balanceDisplay: tokenBalance - amount})
             setTimeout( () => {
               WalletService.balanceOf( web3.eth.defaultAccount ).then( balance => {
-                vevaBalance = balance.toNumber()
-                this.setState({balanceDisplay: vevaBalance})
-                console.log(`new balance ${vevaBalance}`)
+                tokenBalance = balance.toNumber()
+                this.setState({balanceDisplay: tokenBalance})
+                console.log(`new balance ${tokenBalance}`)
               }).catch( balanceErr => console.log('error getting accounts') )
             }, 20000 )
           }).catch( transferErr => console.log('error transferring') )
         } else {
-          alert("So sorry! You don't have enough VEVA tokens to send! Please try transferring a different amount.");
+          alert("So sorry! You don't have enough LMR tokens to send! Please try transferring a different amount.");
           console.log ("Insufficient Balance");
         }
       }
     }
 
     else if ( toAddress.length == 42 && toAddress[0] == '0' && (toAddress[1] == 'x' || toAddress[1] == "X") && amount<=0) {
-      alert("Please enter a valid amount of VEVA tokens!");
+      alert("Please enter a valid amount of LMR tokens!");
       console.log ("invalid amount")
     }
 
@@ -143,7 +143,7 @@ class ViewWallet extends Component {
       <main>
         <h1>Wallet</h1>
         <p><strong>View Balance and Send Tokens Here</strong></p>
-        <p>You have <strong> {this.state.balanceDisplay} </strong> VEVA in your wallet.</p>
+        <p>You have <strong> {this.state.balanceDisplay} </strong> LMR in your wallet.</p>
         <div>
           <label >Send to address</label>
           <input id="address" type="text" maxLength="42" />
@@ -159,11 +159,11 @@ class ViewWallet extends Component {
         <br />
         <div>
           <p>
-            Please Note: You can only send up to the amount of VEVA in your wallet, and you may be charged a transaction fee by the Ethereum network.
+            Please Note: You can only send up to the amount of LMR in your wallet, and you may be charged a transaction fee by the Ethereum network.
             <br/>
             Additionally, please note that valid ERC-20 addresses are 40 hex characters (0-9, A-F), prefixed with "0x".
             <br/>
-            Please ensure that you ONLY send VEVA tokens to a VEVA-compatible ERC-20 wallet!
+            Please ensure that you ONLY send LMR tokens to a compatible ERC-20 wallet!
           </p>
         </div>
 

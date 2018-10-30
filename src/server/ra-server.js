@@ -14,16 +14,16 @@ const bodyParser = require('body-parser')
 
 const parseRange = require('parse-numeric-range').parse
 const config = require('./config')
-const roundsService = require('../src/app/services/API/rounds')
-const cyclesService = require('../src/app/services/API/cycles')
-const tokensService = require('../src/app/services/API/tokens')
+const roundsService = require('../app/services/API/rounds')
+const cyclesService = require('../app/services/API/cycles')
+const tokensService = require('../app/services/API/tokens')
 
-const tokenomics = require('../src/app/services/tokenomics')
-const statusService = require('../src/app/services/analystStatus')
+const tokenomics = require('../app/services/tokenomics')
+const statusService = require('../app/services/analystStatus')
 
-const { getRatingAgency: RatingAgency, getAnalystRegistry: AnalystRegistry } = require('../src/app/services/contracts')
-const utils = require('../src/app/services/utils') // parseB32StringtoUintArray, toHexString, bytesToHex, hexToBytes
-const { bytes32FromIpfsHash, ipfsHashFromBytes32 } = require('../src/app/services/ipfs')
+const { getRatingAgency: RatingAgency, getAnalystRegistry: AnalystRegistry } = require('../app/services/contracts')
+const utils = require('../app/services/utils') // parseB32StringtoUintArray, toHexString, bytesToHex, hexToBytes
+const { bytes32FromIpfsHash, ipfsHashFromBytes32 } = require('../app/services/ipfs')
 
 
 /*
@@ -53,7 +53,7 @@ const emails = [
 
 let s = '****'
 
-const survey = require('../src/app/services/survey')
+const survey = require('../app/services/survey')
 
 let pre = 0
 let post = 1
@@ -90,6 +90,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // configure app to use body
 app.use(bodyParser.json());                         // this will let us get the data from a POST
 
 let web3 =  require('./web3') // require('./web3') //new Web3(config.ETHEREUM.ws)
+console.log('web 3:',web3)
 utils.setWeb3( web3 )
 
 let state = {

@@ -14,7 +14,7 @@ const appConfig = {
   FAKE_ASYNC_DELAY: 1000,
 
 
-  APP_NAME: 'VevaONE',
+  APP_NAME: 'Longmire-IO',
 
   // connection status text references
   CONNECTION_STATUS: {

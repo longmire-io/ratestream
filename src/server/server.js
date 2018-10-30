@@ -14,16 +14,16 @@ const bodyParser = require('body-parser')
 
 const parseRange = require('parse-numeric-range').parse
 const config = require('./config')
-const roundsService = require('../src/app/services/API/rounds')
-const cyclesService = require('../src/app/services/API/cycles')
-const tokensService = require('../src/app/services/API/tokens')
+const roundsService = require('../app/services/API/rounds')
+const cyclesService = require('../app/services/API/cycles')
+const tokensService = require('../app/services/API/tokens')
 
-const tokenomics = require('../src/app/services/tokenomics')
-const statusService = require('../src/app/services/analystStatus')
+const tokenomics = require('../app/services/tokenomics')
+const statusService = require('../app/services/analystStatus')
 
-const { getRatingAgency: RatingAgency, getAnalystRegistry: AnalystRegistry } = require('../src/app/services/contracts')
-const utils = require('../src/app/services/utils') // parseB32StringtoUintArray, toHexString, bytesToHex, hexToBytes
-const { bytes32FromIpfsHash, ipfsHashFromBytes32 } = require('../src/app/services/ipfs')
+const { getRatingAgency: RatingAgency, getAnalystRegistry: AnalystRegistry } = require('../app/services/contracts')
+const utils = require('../app/services/utils') // parseB32StringtoUintArray, toHexString, bytesToHex, hexToBytes
+const { bytes32FromIpfsHash, ipfsHashFromBytes32 } = require('../app/services/ipfs')
 
 
 /*
@@ -53,7 +53,7 @@ const emails = [
 
 let s = '****'
 
-const survey = require('../src/app/services/survey')
+const survey = require('../app/services/survey')
 
 let pre = 0
 let post = 1
@@ -164,7 +164,7 @@ let num_analysts = 60
 let num_leads = 6
 
 let testAnalysts = new Array(num_analysts).fill().map( ( item,idx ) =>
-  ({ id: idx, email: `veva${ (idx<10?'0':'') + idx }@veva.one` })
+  ({ id: idx, email: `lmr${ (idx<10?'0':'') + idx }@longmire.io` })
 )
 console.log( 'test analysts',testAnalysts )
 
@@ -224,8 +224,8 @@ web3.eth.getCoinbase( ( err, coinbase ) => { // setup on launch
       console.log(`${s}creating analysts....please wait`)
       let promises = []
       new Array(num_analysts).fill().map( (_, idx) => {
-        let email = 'veva' + (idx < 10 ? '0':'') + idx + '@veva.one'
-        let password = 'veva'
+        let email = 'lmr' + (idx < 10 ? '0':'') + idx + '@longmire.io'
+        let password = 'lmr'
         promises.push( ar.register(email,password,0) )
         //console.log(`email ${email}`)
       })

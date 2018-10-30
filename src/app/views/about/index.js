@@ -9,8 +9,8 @@ export class About extends PureComponent {
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1">
-              <h1>About Veva</h1>
-              <p><strong>Congratulations!</strong> Welcome to the <span className="dog">Veva Ratings Agency</span> smart contract.</p>
+              <h1>About Longmire</h1>
+              <p><strong>Congratulations!</strong> Welcome to the <span className="dog">Longmire Ratings Agency</span> smart contract.</p>
             </div>
           </div>
           <div className="panel panel-default">
