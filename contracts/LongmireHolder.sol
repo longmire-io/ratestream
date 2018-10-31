@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.19;
 
 import 'openzeppelin-solidity/contracts/token/ERC20/TokenTimelock.sol';
 
@@ -7,9 +7,8 @@ contract LongmireHolder is TokenTimelock {
     IERC20 token,
     address beneficiary,
     uint256 releaseTime
-  ) 
+  )
   TokenTimelock(token, beneficiary, releaseTime) public {
 
   }
 }
-
