@@ -1,5 +1,9 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.19;
 
+contract LongmireHolder {
+
+}
+/*
 import 'openzeppelin-solidity/contracts/token/ERC20/TokenTimelock.sol';
 
 contract LongmireHolder is TokenTimelock {
@@ -12,4 +16,6 @@ contract LongmireHolder is TokenTimelock {
 
   }
 }
+*/
+
 

@@ -168,22 +168,19 @@ let testAnalysts = new Array(num_analysts).fill().map( ( item,idx ) =>
 )
 console.log( 'test analysts',testAnalysts )
 
-const sendError = err => {
-  console.log( 'send error', err )
-}
-const callError = err => {
-  console.log( 'call error', err )
-}
-const apiError = err  => {
-  console.log( 'api error', err )
-}
+const sendError = err => console.log( 'send error', err )
+
+const callError = err => console.log( 'call error', err )
+
+const apiError = err  => console.log( 'api error', err )
+
 const ctlError = err => console.log( 'ctl error', err )
 
 const toDate = timestamp => moment(timestamp*1000).format('MMMM Do YYYY, h:mm:ss a')
 
 const timeInfo = timestamp => {
   let cycle = config.cycleIdx( timestamp )
-  return { timestamp:timestamp, date:toDate( timestamp ), cycle: config.cycleIdx( timestamp ), phase: config.cyclePhase( cycle, timestamp ) }
+  return { timestamp:timestamp, date:toDate( timestamp ), cycle: cycle, phase: config.cyclePhase( cycle, timestamp ) }
 }
 
 //console.log('web3',web3.eth.personal);

@@ -1,6 +1,10 @@
   
-pragma solidity ^0.4.24;
+pragma solidity ^0.4.19;
 
+contract LongmireSale {
+	
+}
+/*
 import 'openzeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
 import 'openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
 
@@ -14,6 +18,7 @@ contract LongmireSale is Crowdsale, CappedCrowdsale {
   }
     
 } 
+*/
 
 
 
