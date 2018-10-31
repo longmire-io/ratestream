@@ -11,11 +11,9 @@ contract LongmireHolder is TokenTimelock {
     IERC20 token,
     address beneficiary,
     uint256 releaseTime
-  ) 
+  )
   TokenTimelock(token, beneficiary, releaseTime) public {
 
   }
 }
 */
-
-
