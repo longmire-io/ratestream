@@ -905,8 +905,10 @@ const app = {
 		console.log('get user activity',user.id)
 		let roundsData = rounds.reduce( (output, round) => {
 			console.log('round',round)
-			let roundUserIdx = round.users.findIndex( rounduser => rounduser.uid == user.id )
+                        let roundUserIdx = round.users.findIndex( rounduser => rounduser.uid == user.id )
 			if (roundUserIdx == -1) return output
+
+                        if (now - round.start >= 2 * MONTH) return output // limit output to 2 months, otherwise too much activity for telegram
 
 			console.log('get round info',round.id)
 			roundUser = round.users[roundUserIdx]
